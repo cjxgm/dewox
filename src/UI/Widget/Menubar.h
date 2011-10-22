@@ -17,16 +17,24 @@ public:
 	Menubar(int x, int y, int w, int h) :
 		UI(x, y, w, h), menubarType(MENUBAR_H),
 		widgets(new List<UI *>())
-	{}
+	{
+		LOG("[Menubar] Created.");
+	}
 	Menubar(int x, int y, int w, int h, MenubarType mtype) :
 		UI(x, y, w, h), menubarType(mtype),
 		widgets(new List<UI *>())
-	{}
+	{
+		LOG("[Menubar] Created.");
+	}
 	
 	UIType getType() { return UI_TYPE_MENUBAR; }
 	void paint();
 	void resize(int w, int h);
-	List<UI *> * add(UI * ui) { return widgets->add(ui); }
+	List<UI *> * add(UI * ui)
+	{
+		LOG("[Menubar] Add widget %d", ui->getType());
+		return widgets->add(ui);
+	}
 private:
 	MenubarType menubarType;
 	List<UI *> * widgets;

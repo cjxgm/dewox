@@ -3,6 +3,7 @@
 #define __UI__
 
 #include "../Util/List.h"
+#include "../Util/Log.h"
 #include "RGB.h"
 #include "ColorManager.h"
 #include <GL/gl.h>
