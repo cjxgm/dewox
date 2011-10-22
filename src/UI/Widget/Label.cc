@@ -10,8 +10,8 @@ void Label::paint()
 	if (h < 16 || w < 10) return;
 
 	glBegin(GL_POINTS);
-	color.apply();
-	for (int i=0; i<text.length(); i++) {
+	colorManager.fgLabel->apply();
+	for (int i=0; i<(int)text.length(); i++) {
 		if ((i + 1) * 10 > w) break;
 		draw_char(text[i], x + i * 10, y);
 	}

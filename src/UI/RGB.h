@@ -1,6 +1,6 @@
 
-#ifndef __RGB__
-#define __RGB__
+#ifndef __UI_RGB__
+#define __UI_RGB__
 
 class RGB
 {

@@ -9,9 +9,14 @@ class Button : public UI
 public:
 	Label * label;
 
-	Button(int x, int y, int w, int h, string text)
-		: UI(x, y, w, h),
-			label(new Label(0, 0, 0, 0, text, RGB(255, 255, 255))) {}
+	Button(int x, int y, int w, int h) :
+		UI(x, y, w, h),
+		label(new Label(0, 0, 0, 0, ""))
+	{}
+	Button(int x, int y, int w, int h, string text):
+		UI(x, y, w, h),
+		label(new Label(0, 0, 0, 0, text))
+	{}
 	
 	~Button() { delete label; }
 

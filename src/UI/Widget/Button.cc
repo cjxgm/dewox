@@ -6,10 +6,11 @@ void Button::paint()
 	if (hidden) return;
 
 	glBegin(GL_QUADS);
+	colorManager.bgButton1->apply();
 	glColor3f(0.5, 0.5, 0.5);
 	glVertex2f(x + w, y + h);
 	glVertex2f(x, y + h);
-	glColor3f(0.25, 0.25, 0.25);
+	colorManager.bgButton2->apply();
 	glVertex2f(x, y);
 	glVertex2f(x + w, y);
 	glEnd();

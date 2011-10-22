@@ -4,15 +4,19 @@
 
 #include "../Util/List.h"
 #include "RGB.h"
+#include "ColorManager.h"
 #include <GL/gl.h>
 #include <string>
 using namespace std;
 
 typedef enum UIType
 {
-	UI_TYPE_UNKNOWN,
+	UI_TYPE_APP,
+	UI_TYPE_FRAME,
 	UI_TYPE_LABEL,
 	UI_TYPE_BUTTON,
+	UI_TYPE_VSPLIT,
+	UI_TYPE_HSPLIT,
 }
 UIType;
 
@@ -43,6 +47,9 @@ public:
 
 #include "Widget/Label.h"
 #include "Widget/Button.h"
+#include "Widget/Frame.h"
+#include "Widget/VSplit.h"
+#include "Widget/HSplit.h"
 
 #endif
 
