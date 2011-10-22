@@ -1,9 +1,9 @@
 
-#include "backend.h"
+#include "Backend.h"
 #include <GL/glut.h>
-#include "ui/ui.h"
+#include "UI/UI.h"
 
-static LIST * widgets;
+static List<UI *> * widgets;
 static float xxx = 100;
 
 typedef struct view
@@ -38,10 +38,12 @@ void render()
 	glColor3f(0.4, 0, 0);
 	glRectf(v->x+1, v->y+1, v->x + v->w, v->y + v->h);
 
-	LIST * lst = widgets;
-	while ((lst = lst->next) != widgets) {
-		ui_get(lst)->resize(ui_get(lst), xxx, ui_get(lst)->h);
-		ui_get(lst)->paint(ui_get(lst));
+	UI * ui;
+	widgets->iterBegin();
+	while (!widgets->iterDone()) {
+		ui = widgets->iterGet();
+		ui->resize(xxx, ui->h);
+		ui->paint();
 	}
 
 	glutSwapBuffers();
@@ -49,7 +51,7 @@ void render()
 	xxx += 0.1;
 }
 
-void backend_run()
+void Backend::run()
 {
 	int argc = 0;
 	glutInit(&argc, NULL);
@@ -59,13 +61,9 @@ void backend_run()
 	glutIdleFunc(&render);
 	glutReshapeFunc(&resize);
 
-	widgets = list_new();
-	LIST * lst;
-
-	lst = NEW(LIST);
-	lst->data = NEW(UI_BUTTON);
-	ui_button_init(lst->data, 10, 10, 100, 20, "Hello, world!");
-	list_append(widgets, lst);
+	widgets = new List<UI *>;
+	widgets->add(new Button(10, 10, 100, 20, "Hello, world!"));
 
 	glutMainLoop();
 }
+
