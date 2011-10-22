@@ -17,6 +17,7 @@ typedef enum UIType
 	UI_TYPE_BUTTON,
 	UI_TYPE_VSPLIT,
 	UI_TYPE_HSPLIT,
+	UI_TYPE_MENUBAR,
 }
 UIType;
 
@@ -50,6 +51,7 @@ public:
 #include "Widget/Frame.h"
 #include "Widget/VSplit.h"
 #include "Widget/HSplit.h"
+#include "Widget/Menubar.h"
 
 #endif
 

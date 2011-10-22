@@ -18,6 +18,9 @@ void App::resize(int w, int h)
 	menubar->resize(w, 20);
 	menubar->move(0, h - menubar->h);
 
+	btnSave->resize((btnSave->label->text.length() + 1) * 10, menubar->h);
+	//btnSave->move(0, 0);
+
 	preview->resize(300, 300);
 	preview->move(0, h - menubar->h - preview->h);
 
@@ -31,7 +34,7 @@ void App::resize(int w, int h)
 	hsplit->resize(w, vsplit->w);
 	hsplit->move(0, preview->y - hsplit->h);
 
-	// stacking->move(0, 0);	// no need to move this.
 	stacking->resize(w, h - menubar->h - preview->h - hsplit->h);
+	// stacking->move(0, 0);	// no need to move this.
 }
 

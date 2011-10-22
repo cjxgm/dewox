@@ -35,6 +35,15 @@ public:
 	void iterBegin() { iter = this->next; }
 	T iterGet() { return (iter = iter->next)->prev->data; }
 	bool iterDone() { return (iter == this); }
+
+	unsigned int size()
+	{
+		unsigned int cnt = 0;
+		iter = this;
+		while ((iter = iter->next) != this)
+			cnt++;
+		return cnt;
+	}
 private:
 	List<T> * iter;
 };

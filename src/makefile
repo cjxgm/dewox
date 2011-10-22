@@ -8,7 +8,8 @@ OBJ_UI_WIDGET = UI/Widget/Button.o \
 				UI/Widget/Font.o \
 				UI/Widget/Frame.o \
 				UI/Widget/VSplit.o \
-				UI/Widget/HSplit.o
+				UI/Widget/HSplit.o \
+				UI/Widget/Menubar.o
 OBJ_UI = UI/UI.o UI/RGB.o UI/ColorManager.o $(OBJ_UI_WIDGET)
 
 OBJ_UTIL = Util/List.o
