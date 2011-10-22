@@ -21,9 +21,13 @@ struct ui
 {
 	enum ui_type type;
 	int x, y, w, h;
+	char hidden;
 
 	virtual void (*delete)(UI * ui);
 	virtual void (*paint)(UI * ui);
+
+	virtual void (*resize)(UI * ui, int w, int h);
+	virtual void (*move  )(UI * ui, int x, int y);
 };
 #define ui_get(lst)		list_get(lst, UI *)
 

@@ -25,6 +25,7 @@ static void _delete(UI * ui)
 
 void _paint(UI * ui)
 {
+	if (ui->hidden) return;
 	if (ui->h < 16 || ui->w < 10) return;
 
 	const char * s = ((UI_LABEL *)ui)->text;
@@ -51,3 +52,4 @@ void draw_char(unsigned char ch, int x, int y)
 			glVertex2f(x+a, 16+y-b);
 	}
 }
+

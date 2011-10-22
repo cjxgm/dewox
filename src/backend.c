@@ -4,6 +4,7 @@
 #include "ui/ui.h"
 
 static LIST * widgets;
+static float xxx = 100;
 
 typedef struct view
 {
@@ -38,10 +39,14 @@ void render()
 	glRectf(v->x+1, v->y+1, v->x + v->w, v->y + v->h);
 
 	LIST * lst = widgets;
-	while ((lst = lst->next) != widgets)
+	while ((lst = lst->next) != widgets) {
+		ui_get(lst)->resize(ui_get(lst), xxx, ui_get(lst)->h);
 		ui_get(lst)->paint(ui_get(lst));
+	}
 
 	glutSwapBuffers();
+
+	xxx += 0.1;
 }
 
 void backend_run()
@@ -59,7 +64,7 @@ void backend_run()
 
 	lst = NEW(LIST);
 	lst->data = NEW(UI_BUTTON);
-	ui_button_init(lst->data, 10, 10, 100, 20, "Hello!");
+	ui_button_init(lst->data, 10, 10, 100, 20, "Hello, world!");
 	list_append(widgets, lst);
 
 	glutMainLoop();
