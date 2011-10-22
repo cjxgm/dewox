@@ -1,7 +1,7 @@
 
 #include "backend.h"
 #include <GL/glut.h>
-#include "ui.h"
+#include "ui/ui.h"
 
 static LIST * widgets;
 
@@ -50,7 +50,7 @@ void backend_run()
 	glutInit(&argc, NULL);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
 	glutInitWindowSize(640, 480);
-	glutCreateWindow("Maze");
+	glutCreateWindow("Dewox UI Experiments");
 	glutIdleFunc(&render);
 	glutReshapeFunc(&resize);
 

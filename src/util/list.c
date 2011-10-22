@@ -1,5 +1,6 @@
 
 #include "list.h"
+#include "util.h"
 
 LIST * list_new()
 {
