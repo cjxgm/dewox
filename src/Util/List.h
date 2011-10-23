@@ -25,6 +25,10 @@ public:
 		return list;
 	}
 
+	void iterBegin() { iter = this->next; }
+	T iterGet() { return (iter = iter->next)->prev->data; }
+	bool iterDone() { return (iter == this); }
+
 	// remove self from the list, but won't be deleted
 	void remove()
 	{
@@ -32,9 +36,17 @@ public:
 		next->prev = prev;
 	}
 
-	void iterBegin() { iter = this->next; }
-	T iterGet() { return (iter = iter->next)->prev->data; }
-	bool iterDone() { return (iter == this); }
+	// remove a node from the list, and deleted that node(but not data).
+	void remove(T data)
+	{
+		iterBegin();
+		while (!iterDone())
+			if (iterGet() == data) {
+				iter->remove();
+				delete iter;
+				break;
+			}
+	}
 
 	unsigned int size()
 	{

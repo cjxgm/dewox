@@ -15,15 +15,15 @@ public:
 	ColorManager() :
 		fgLabel(new RGB(0, 0, 0)),
 
-		bgButton1(new RGB(128, 128, 128)),
-		bgButton2(new RGB(64, 64, 64)),
+		bgButton1(new RGB(150, 150, 150)),
+		bgButton2(new RGB(100, 100, 100)),
 
 		bgFrame(new RGB(140, 140, 140)),
 		focusFrameBorder(new RGB(255, 255, 255)),
-		unfocusFrameBorder(new RGB(0, 0, 0)),
+		unfocusFrameBorder(new RGB(128, 128, 128)),
 
 		bgMenubar1(new RGB(128, 128, 150)),
-		bgMenubar2(new RGB(100, 100, 150))
+		bgMenubar2(new RGB(100, 100, 120))
 	{}
 };
 

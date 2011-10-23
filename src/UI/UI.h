@@ -10,7 +10,7 @@
 #include <string>
 using namespace std;
 
-typedef enum UIType
+enum UIType
 {
 	UI_TYPE_APP,
 	UI_TYPE_FRAME,
@@ -19,8 +19,33 @@ typedef enum UIType
 	UI_TYPE_VSPLIT,
 	UI_TYPE_HSPLIT,
 	UI_TYPE_MENUBAR,
-}
-UIType;
+};
+
+enum MouseEventType
+{
+	MOUSE_MOVE,
+	MOUSE_DOWN,
+	MOUSE_UP,
+	MOUSE_CLICK,
+};
+
+enum MouseButtonType
+{
+	MOUSE_LEFT,
+	MOUSE_RIGHT,
+	MOUSE_MIDDLE,
+};
+
+enum KeyEventType
+{
+	KEY_DOWN,
+	KEY_UP,
+	KEY_PRESSED,
+};
+
+#define KEY_ALT		(1<<0)
+#define KEY_CTRL	(1<<1)
+#define KEY_SHIFT	(1<<2)
 
 class UI
 {
@@ -45,8 +70,16 @@ public:
 		this->x = x;
 		this->y = y;
 	}
+
+	virtual void mouseEvent(MouseEventType t,
+							MouseButtonType b,
+							int x, int y) {}
+	virtual void keyEvent  (KeyEventType t,
+							int keycode,
+							int modifier) {}
 };
 
+#include "EventManager.h"
 #include "Widget/Label.h"
 #include "Widget/Button.h"
 #include "Widget/Frame.h"
