@@ -12,6 +12,8 @@ public:
 	
 	UIType getType() { return UI_TYPE_HSPLIT; }
 	void paint();
+	void onDrag   (int x, int y);
+	void onPressed(int x, int y);
 };
 
 #endif

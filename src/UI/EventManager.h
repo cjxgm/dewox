@@ -11,6 +11,8 @@ public:
 	UI * keyHooker;
 
 	EventManager():
+		mouseHooker(NULL),
+		keyHooker(NULL),
 		mouseListeners(new List<UI *>()),
 		keyListeners(new List<UI *>())
 	{}

@@ -4,6 +4,8 @@
 
 #include "../UI/UI.h"
 
+extern string dw_file;
+
 class App : public UI
 {
 public:
@@ -17,16 +19,19 @@ public:
 		vsplit(new VSplit(0, 0, 0, 0)),
 
 		menubar(new Menubar(0, 0, 0, 0, MENUBAR_H)),
-		btnSave(new Button(0, 0, 0, 0, "Save"))
+		btnSave(new Button(0, 0, 0, 0, "Save")),
+		lbFilename(new Label(0, 0, 0, 0, dw_file))
 	{
 		eventManager.listenKey(this);
 		menubar->add(btnSave);
+		menubar->add(lbFilename);
 	}
 
 	UIType getType() { return UI_TYPE_APP; }
 	void paint();
 	void resize(int w, int h);
 	void keyEvent(KeyEventType t, int keycode, int modifier);
+	void update();
 
 private:
 	Frame * preview;
@@ -36,7 +41,8 @@ private:
 	VSplit * vsplit;
 
 	Menubar * menubar;
-	Button * btnSave;
+	Button  * btnSave;
+	Label   * lbFilename;
 };
 
 #endif
