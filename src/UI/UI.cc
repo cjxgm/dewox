@@ -1,6 +1,12 @@
 
 #include "UI.h"
 
+UI::~UI()
+{
+	eventManager.unlistenMouse(this);
+	eventManager.unlistenKey  (this);
+}
+
 /* It may be useful some other places.
 void _paint(UI * ui)
 {

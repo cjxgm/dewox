@@ -55,6 +55,8 @@ public:
 
 	UI(int x, int y, int w, int h)
 		: x(x), y(y), w(w), h(h), hidden(0) {}
+	
+	~UI();
 
 	virtual void paint() = 0;
 	virtual UIType getType() = 0;

@@ -7,6 +7,9 @@
 class EventManager
 {
 public:
+	UI * mouseHooker;
+	UI * keyHooker;
+
 	EventManager():
 		mouseListeners(new List<UI *>()),
 		keyListeners(new List<UI *>())
@@ -14,15 +17,25 @@ public:
 
 	void mouseEvent(MouseEventType t, MouseButtonType b, int x, int y)
 	{
-		mouseListeners->iterBegin();
-		while (!mouseListeners->iterDone())
-			mouseListeners->iterGet()->mouseEvent(t, b, x, y);
+		if (mouseHooker)
+			mouseHooker->mouseEvent(t, b, x, y);
+
+		else {
+			mouseListeners->iterBegin();
+			while (!mouseListeners->iterDone())
+				mouseListeners->iterGet()->mouseEvent(t, b, x, y);
+		}
 	}
 	void keyEvent(KeyEventType t, int keycode, int modifier)
 	{
-		keyListeners->iterBegin();
-		while (!keyListeners->iterDone())
-			keyListeners->iterGet()->keyEvent(t, keycode, modifier);
+		if (keyHooker)
+			keyHooker->keyEvent(t, keycode, modifier);
+
+		else {
+			keyListeners->iterBegin();
+			while (!keyListeners->iterDone())
+				keyListeners->iterGet()->keyEvent(t, keycode, modifier);
+		}
 	}
 
 	List<UI *> * listenMouse(UI * ui) { return mouseListeners->add(ui); }
