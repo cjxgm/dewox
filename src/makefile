@@ -4,7 +4,7 @@ CFLAGS = -Wall -s -Ofast
 LIBS = -lglut -lm
 
 
-OBJ_MAIN = main.o video.o pager.o widget.o pagefile.o
+OBJ_MAIN = main.o video.o pager.o widget.o pagefile.o font.o
 OBJS = $(OBJ_MAIN)
 
 
