@@ -1,0 +1,12 @@
+widget.o: widget.c /usr/include/GL/gl.h /usr/include/GL/glext.h \
+ /usr/lib/gcc/i686-pc-linux-gnu/4.6.1/include/stddef.h widget.h font.h
+
+/usr/include/GL/gl.h:
+
+/usr/include/GL/glext.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.6.1/include/stddef.h:
+
+widget.h:
+
+font.h:

@@ -1,0 +1,5 @@
+pagefile.o: pagefile.c pagefile.h pager.h
+
+pagefile.h:
+
+pager.h:
