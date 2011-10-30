@@ -1,4 +1,5 @@
 
+#include "video.h"
 #include "pager.h"
 #include "widget.h"
 
@@ -11,15 +12,33 @@ int  cpage = 0;
 
 void pager_click(int button, int state, int x, int y)
 {
+	if (button == MOUSE_LEFT && state == MOUSE_DOWN) {
+		int i;
+		for (i=0; i<PAGE_SIZE; i++) {
+			if (pages[i].hovered) {
+				cpage = i;
+				break;
+			}
+		}
+	}
 }
 
 void pager_hover(int x, int y)
 {
+	int i;
+	for (i=0; i<PAGE_SIZE; i++) {
+		pages[i].hovered = hovertest_box(x, y,
+			i*102, win_h-30, (i+1)*102-2, win_h);
+	}
 }
 
 void pager_draw()
 {
-	draw_button(pages[cpage].name, 0, win_h-30, 100, win_h);
+	int i;
+	for (i=0; i<PAGE_SIZE; i++) {
+		draw_button(pages[i].name, i*102, win_h-30, (i+1)*102-2, win_h,
+			(cpage == i? 2 : pages[i].hovered));
+	}
 }
 
 

@@ -31,8 +31,9 @@ void draw_string_centered(int x, int y, int w,
 	int i = x - (strlen(str)*(8+spacing)-8)/2;
 	while (*str) {
 		if (i > x+w/2-8) break;
-		if (i < x-w/2) continue;
-		draw_char(i, y, *str++);
+		if (i >= x-w/2)
+			draw_char(i, y, *str);
+		str++;
 		i += 8 + spacing;
 	}
 }

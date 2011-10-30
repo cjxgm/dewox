@@ -46,8 +46,9 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_dewox_OBJECTS = main.$(OBJEXT) video.$(OBJEXT) pager.$(OBJEXT) \
-	widget.$(OBJEXT) pagefile.$(OBJEXT) font.$(OBJEXT)
+am_dewox_OBJECTS = main.$(OBJEXT) font.$(OBJEXT) video.$(OBJEXT) \
+	pager.$(OBJEXT) widget.$(OBJEXT) pagefile.$(OBJEXT) \
+	pagescene.$(OBJEXT)
 dewox_OBJECTS = $(am_dewox_OBJECTS)
 dewox_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I.@am__isrc@
@@ -149,7 +150,14 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-dewox_SOURCES = main.c video.c video.h pager.c pager.h widget.c widget.h pagefile.c pagefile.h font.c font.h
+dewox_SOURCES = main.c \
+	font.c font.h \
+	video.c video.h \
+	pager.c pager.h \
+	widget.c widget.h \
+	pagefile.c pagefile.h \
+	scene/pagescene.c scene/pagescene.h
+
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
@@ -253,6 +261,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pagefile.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pager.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pagescene.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/video.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/widget.Po@am__quote@
 
@@ -269,6 +278,20 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(COMPILE) -c `$(CYGPATH_W) '$<'`
+
+pagescene.o: scene/pagescene.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT pagescene.o -MD -MP -MF $(DEPDIR)/pagescene.Tpo -c -o pagescene.o `test -f 'scene/pagescene.c' || echo '$(srcdir)/'`scene/pagescene.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/pagescene.Tpo $(DEPDIR)/pagescene.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='scene/pagescene.c' object='pagescene.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o pagescene.o `test -f 'scene/pagescene.c' || echo '$(srcdir)/'`scene/pagescene.c
+
+pagescene.obj: scene/pagescene.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT pagescene.obj -MD -MP -MF $(DEPDIR)/pagescene.Tpo -c -o pagescene.obj `if test -f 'scene/pagescene.c'; then $(CYGPATH_W) 'scene/pagescene.c'; else $(CYGPATH_W) '$(srcdir)/scene/pagescene.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/pagescene.Tpo $(DEPDIR)/pagescene.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='scene/pagescene.c' object='pagescene.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o pagescene.obj `if test -f 'scene/pagescene.c'; then $(CYGPATH_W) 'scene/pagescene.c'; else $(CYGPATH_W) '$(srcdir)/scene/pagescene.c'; fi`
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
