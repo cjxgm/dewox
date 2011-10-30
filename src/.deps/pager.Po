@@ -1,5 +1,0 @@
-pager.o: pager.c pager.h widget.h
-
-pager.h:
-
-widget.h:
