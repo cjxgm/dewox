@@ -40,7 +40,9 @@ void video_init()
 	glutTimerFunc(30, &update, 0);
 	glutReshapeFunc(&resize);
 	glutDisplayFunc(&display);
-	//glutFullScreen();
+#ifdef FULLSCREEN
+	glutFullScreen();
+#endif
 	
 	glClearColor(0, 0, 0, 0);
 }

@@ -13,7 +13,7 @@ static void pagefile_draw();
 void pagefile_init()
 {
 	pages[PAGE_FILE] = (page){
-		"file",
+		"File",
 		.draw = &pagefile_draw
 	};
 }

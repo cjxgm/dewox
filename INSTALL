@@ -1,0 +1,19 @@
+dewox - An RAD [de]momaker inspired by [W]erkkzeug for [O]penGL & Linu[x]
+
+~~~~~~~~~~~~~~
+ REQUIREMENTS
+~~~~~~~~~~~~~~
+OS           : Linux
+Compiler     : gcc or clang
+Dependencies : OpenGL, OpenAL, GLUT, scons
+
+~~~~~~~~~~~~~~
+ INSTALLATION
+~~~~~~~~~~~~~~
+It's quite simple once you get all the requirements worked correctly.
+Just type following command, then you can compile it.
+
+	scons
+
+If you want to configure the compilation, type 'scons -h' for more details.
+

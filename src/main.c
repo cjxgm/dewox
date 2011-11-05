@@ -1,5 +1,6 @@
 
 #include <GL/gl.h>
+#include <stdlib.h>
 
 #include "video.h"
 #include "widget.h"
@@ -9,6 +10,7 @@
 #include "pager.h"
 #include "pagefile.h"
 #include "scene/pagescene.h"
+#include "track/pagetrack.h"
 
 // in video.c
 extern int win_w;
@@ -21,6 +23,7 @@ int main()
 	// font_init();
 	pagefile_init();
 	pagescene_init();
+	pagetrack_init();
 
 	video_init();
 	video_run();
@@ -52,6 +55,8 @@ void main_hover(int x, int y)
 
 void main_key(unsigned char k, int x, int y)
 {
+	if (k == 27)	// esc
+		exit(0);
 	if (disabled) return;
 	if (pages[cpage].key)
 		pages[cpage].key(k, x, y);

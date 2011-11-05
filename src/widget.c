@@ -3,16 +3,16 @@
 #include "widget.h"
 #include "font.h"
 
-int hovertest_box(int mx, int my, int x0, int y0, int x1, int y1)
+int hovertest_box(int mx, int my, int x, int y, int w, int h)
 {
-	return (mx>x0 && mx<x1) && (my>y0 && my<y1);
+	return (mx>x && mx<x+w) && (my>y && my<y+h);
 }
 
 // state: 0 normal
 //        1 hover
 //        2 selected
-void draw_button(const char * label, int x0, int y0,
-		int x1, int y1, int state)
+void draw_button(const char * label, int x, int y,
+		int w, int h, int state)
 {
 	switch (state) {
 	case 0:
@@ -28,16 +28,16 @@ void draw_button(const char * label, int x0, int y0,
 		glColor3f(0.0f, 0.0f, 0.0f);
 		break;
 	}
-	glVertex2f(x0, y0);
-	glVertex2f(x1, y0);
+	glVertex2f(x, y);
+	glVertex2f(x+w, y);
 	if (state == 2) glColor3f(0.5f, 0.5f, 0.5f);
-	glVertex2f(x1, y1);
-	glVertex2f(x0, y1);
+	glVertex2f(x+w, y+h);
+	glVertex2f(x, y+h);
 	glEnd();
 
 	// draw label
-	if (y1-y0 < 16) return;
+	if (y+h-y < 16) return;
 	if (state == 2) glColor3f(1.0f, 1.0f, 1.0f);
-	draw_string_centered((x0+x1-8)/2, (y0+y1-16)/2, x1-x0, label, 0);
+	draw_string_centered((x+x+w-8)/2, (y+y+h-16)/2, w, label, 0);
 }
 

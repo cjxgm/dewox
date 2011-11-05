@@ -1,0 +1,47 @@
+
+debug = int(ARGUMENTS.get('debug', 0))
+Dfullscreen = '-DFULLSCREEN ' if int(ARGUMENTS.get('fullscreen', 0)) else ''
+defines = Dfullscreen
+
+# environments
+debug_gcc = '-g -DDEBUG' if debug else '-s -O2'
+env_gcc = Environment(CC = 'gcc', \
+					CCFLAGS = defines + debug_gcc + ' -Wall -Werror', \
+					LIBS = Split('glut openal m GL'))
+
+debug_clang = '-g -DDEBUG' if debug else '-O2'
+env_clang = Environment(CC = 'clang', \
+					CCFLAGS = defines + debug_clang + ' -Wall -Werror', \
+					LIBS = Split('glut openal m GL'))
+
+env = env_gcc	# default environment
+if ARGUMENTS.get('CC', 0) == 'clang':
+	env = env_clang
+
+Help("""
+Type 'scons' to build dewox with default configurations.
+
+Type 'scons option=value' to specify options.
+
+Options:
+    CC                  Specify C Compiler. Available values are 'gcc'
+                        and 'clang'.
+                        Default value is 'gcc'.
+
+    debug               Specify whether enable debugging. Set to 0 for
+                        no-debugging, or any other numbers for debugging.
+                        Default value is 0.
+
+    fullscreen          Specify whether enable fullscreen. Set to 0 for
+                        no-fullscreen, or any other numbers for fullscreen.
+                        Default value is 0.
+
+For example, type:
+    scons CC=clang debug=1
+for enabling debugging mode and using clang to compile.
+
+""");
+
+env.Program(target = 'dewox', \
+			source = Glob('*.c') + Glob('*/*.c'))
+

@@ -1,5 +1,7 @@
 
-20111029:	Rewrote in C.
+20111029-20111105:	eXerigumo Clanjor <cjxgm@126.com>
+			Rewrote in C.
 			Inspired by Komposter, Dewox is redesigned.
 			It includes a tracker now!
+			Use scons to build.
 

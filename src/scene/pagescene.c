@@ -1,7 +1,7 @@
 
 #include "pagescene.h"
 #include "../pager.h"
-#include "font.h"
+#include "../font.h"
 #include "GL/gl.h"
 
 // in video.c
@@ -13,7 +13,7 @@ static void pagescene_draw();
 void pagescene_init()
 {
 	pages[PAGE_SCENE] = (page){
-		"scene",
+		"Scene",
 		.draw = &pagescene_draw
 	};
 }
