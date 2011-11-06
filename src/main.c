@@ -1,79 +1,75 @@
 
-#include <GL/gl.h>
+
+#include <GL/glut.h>
+
 #include <stdlib.h>
 
-#include "video.h"
-#include "widget.h"
-#include "font.h"
+// in stacking.c
+extern void click(int btn, int stt, int x, int y);
+extern void drag(int x, int y);
+extern void hover(int x, int y);
+extern void draw();
+extern void keypress(int key, int x, int y);
 
-// pager and pages
-#include "pager.h"
-#include "pagefile.h"
-#include "scene/pagescene.h"
-#include "track/pagetrack.h"
+int win_w;
+int win_h;
 
-// in video.c
-extern int win_w;
-extern int win_h;
-
-int disabled = 0;// When the screen is too small everything will be diabled.
-
-int main()
+static void resize(int w, int h)
 {
-	// font_init();
-	pagefile_init();
-	pagescene_init();
-	pagetrack_init();
-
-	video_init();
-	video_run();
-	return 0;
+  win_w = w;
+  win_h = h;
+  
+  glViewport(0, 0, w, h);
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  glOrtho(0, w, h, 0, -1, 1);
+    
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity() ;
 }
 
-void main_click(int button, int state, int x, int y)
+static void display()
 {
-	if (disabled) return;
-	pager_click(button, state, x, y);
-	if (pages[cpage].click)
-		pages[cpage].click(button, state, x, y);
+  // const double t = glutGet(GLUT_ELAPSED_TIME) / 1000.0;
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  draw();
+  glutSwapBuffers();
 }
 
-void main_drag(int x, int y)
+
+static void key(unsigned char key, int x, int y)
 {
-	if (disabled) return;
-	if (pages[cpage].drag)
-		pages[cpage].drag(x, y);
+  keypress(key, x, y);
+  glutPostRedisplay();
 }
 
-void main_hover(int x, int y)
+static void timer(int unused)
 {
-	if (disabled) return;
-	pager_hover(x, y);
-	if (pages[cpage].hover)
-		pages[cpage].hover(x, y);
+  glutTimerFunc(30, &timer, 0);
+  glutPostRedisplay();
 }
 
-void main_key(unsigned char k, int x, int y)
+int main(int argc, char *argv[])
 {
-	if (k == 27)	// esc
-		exit(0);
-	if (disabled) return;
-	if (pages[cpage].key)
-		pages[cpage].key(k, x, y);
-}
+  glutInit(&argc, argv);
+  glutInitWindowSize(800, 600);
+  glutInitWindowPosition(10, 10);
+  glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
 
-void main_render()
-{
-	disabled = (win_w < 640 || win_h < 480);
+  glutCreateWindow("Stacking Experiment");
 
-	if (disabled) {
-		glColor3f(1, 0, 0);
-		draw_string_centered(win_w/2, win_h/2, win_w, "Please make the window larger than 640x480!", 0);
-		return;
-	}
+  glutReshapeFunc(resize);
+  glutDisplayFunc(display);
+  glutKeyboardFunc(key);
+  glutMouseFunc(click);
+  glutMotionFunc(drag);
+  glutPassiveMotionFunc(hover);
+  glutTimerFunc(30, &timer, 0);
 
-	if (pages[cpage].draw)
-		pages[cpage].draw();
-	pager_draw();
+  glClearColor(0, 0, 0, 0);
+  
+  glutMainLoop();
+
+  return EXIT_SUCCESS;
 }
 
