@@ -36,8 +36,8 @@ void draw_button(const char * label, int x, int y,
 	glEnd();
 
 	// draw label
-	if (y+h-y < 16) return;
+	if (h < 16) return;
 	if (state == 2) glColor3f(1.0f, 1.0f, 1.0f);
-	draw_string_centered((x+x+w-8)/2, (y+y+h-16)/2, w, label, 0);
+	draw_string_centered(x+(w-8)/2, y+(h-16)/2, w, label, 0);
 }
 
