@@ -11,6 +11,7 @@
 #include "pagefile.h"
 #include "scene/pagescene.h"
 #include "track/pagetrack.h"
+#include "pageconfig.h"
 
 // in video.c
 extern int win_w;
@@ -24,6 +25,7 @@ int main()
 	pagefile_init();
 	pagescene_init();
 	pagetrack_init();
+	pageconfig_init();
 
 	video_init();
 	video_run();

@@ -22,7 +22,7 @@ page;
 #define PAGE_SCENE		1
 #define PAGE_TRACK		2
 #define PAGE_CONFIG		3
-#define PAGE_SIZE		3	// TODO!
+#define PAGE_SIZE		4
 extern page pages[PAGE_SIZE];
 extern int  cpage;
 

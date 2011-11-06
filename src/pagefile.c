@@ -1,8 +1,9 @@
 
+#include <GL/gl.h>
+
 #include "pagefile.h"
 #include "pager.h"
 #include "font.h"
-#include "GL/gl.h"
 
 // in video.c
 extern int win_w;
