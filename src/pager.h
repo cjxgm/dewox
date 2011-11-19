@@ -2,10 +2,6 @@
 #ifndef __PAGER__
 #define __PAGER__
 
-#ifndef NULL
-#define NULL ((void *)0)
-#endif
-
 typedef struct
 {
 	const char * name;
