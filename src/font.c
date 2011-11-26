@@ -1,7 +1,11 @@
 
 #include <string.h>
 #include <GL/gl.h>
+
 #include "font.h"
+
+
+
 
 void draw_char(int x, int y, unsigned char ch)
 {
@@ -16,6 +20,7 @@ void draw_char(int x, int y, unsigned char ch)
 	}
 	glEnd();
 }
+
 void draw_string(int x, int y, int w, const char * str, int spacing)
 {
 	int i = x;
@@ -25,6 +30,7 @@ void draw_string(int x, int y, int w, const char * str, int spacing)
 		i += 8 + spacing;
 	}
 }
+
 void draw_string_centered(int x, int y, int w,
 		const char * str, int spacing)
 {
@@ -37,6 +43,10 @@ void draw_string_centered(int x, int y, int w,
 		i += 8 + spacing;
 	}
 }
+
+
+
+
 unsigned char font[256*16] = {
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x7e, 0x81, 0xa5, 0x81, 0x81, 0xbd, 0x99, 0x81, 0x81, 0x7e, 0x00, 0x00, 0x00, 0x00,

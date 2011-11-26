@@ -1,15 +1,14 @@
 
-#include "video.h"
+#include "window.h"
+#include "common.h"
+#include "config.h"
+#include "event.h"
 
-int win_w;
-int win_h;
 
-// in main.c
-extern void main_click(int button, int state, int x, int y);
-extern void main_drag(int x, int y);
-extern void main_hover(int x, int y);
-extern void main_key(unsigned char k, int x, int y);
-extern void main_render();
+
+
+static int win_w = 800;
+static int win_h = 600;
 
 static void click(int button, int state, int x, int y);
 static void drag(int x, int y);
@@ -19,16 +18,21 @@ static void resize(int w, int h);
 static void update(int unused);
 static void display();
 
-// Initialize OpenGL
-void video_init()
+
+
+
+void window_init()
 {
+	LOG_INFO("[window] glut init\n");
 	int argc = 0;
 	glutInit(&argc, NULL);
 
+	LOG_INFO("[window] create window\n");
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
-	glutInitWindowSize(800, 600);
-	glutCreateWindow("dewox");
+	glutInitWindowSize(win_w, win_h);
+	glutCreateWindow(VERSION_STRING);
 
+	LOG_INFO("[window] bind events\n");
 	glutMouseFunc(&click);
 	glutMotionFunc(&drag);
 	glutPassiveMotionFunc(&hover);
@@ -41,38 +45,44 @@ void video_init()
 	glutReshapeFunc(&resize);
 	glutDisplayFunc(&display);
 #ifdef FULLSCREEN
+	LOG_INFO("[window] enable fullscreen\n");
 	glutFullScreen();
 #endif
 	
-	glClearColor(0, 0, 0, 0);
+	LOG_INFO("[window] set up bg color\n");
+	glClearColor(COLOR_MAIN_BG, 1.0f);
 }
 
-void video_run()
+void window_run()
 {
+	LOG_INFO("[window] run\n");
 	glutMainLoop();
 }
 
+
+
+
 void click(int button, int state, int x, int y)
 {
-	main_click(button, state, x, y);
+	event_click(button, state, x, y);
 	glutPostRedisplay();
 }
 
 void drag(int x, int y)
 {
-	main_drag(x, y);
+	event_drag(x, y);
 	glutPostRedisplay();
 }
 
 void hover(int x, int y)
 {
-	main_hover(x, y);
+	event_hover(x, y);
 	glutPostRedisplay();
 }
 
 void key(unsigned char k, int x, int y)
 {
-	main_key(k, x, y);
+	event_key(k);
 	glutPostRedisplay();
 }
 
@@ -101,7 +111,7 @@ void resize(int w, int h)
 void display()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	main_render();
+	event_draw(win_w, win_h);
 	glutSwapBuffers();
 }
 
