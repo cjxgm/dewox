@@ -14,7 +14,7 @@ WState;
 
 
 int hovertest_box(int mx, int my, int x, int y, int w, int h);
-
+void draw_border(int x, int y, int w, int h);
 
 #endif
 

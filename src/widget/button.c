@@ -36,6 +36,7 @@ void wbutton_draw(WButton * w)
 	}
 	draw_string_centered(w->x + w->w/2, w->y + (w->h-16)/2, w->w,
 							w->label, 0);
+	draw_border(w->x, w->y, w->w, w->h);
 }
 
 void wbutton_click(WButton * w, int button, int state, int x, int y)
@@ -43,15 +44,25 @@ void wbutton_click(WButton * w, int button, int state, int x, int y)
 	if (button == MOUSE_LEFT && state == MOUSE_DOWN)
 		if (w->state == WSTATE_HOVERED) {
 			w->state = WSTATE_PRESSED;
-			hook(w, (ClickFunc)&wbutton_click, NULL, NULL, NULL);
+			hook(w, (ClickFunc)&wbutton_click, (DragFunc)&wbutton_drag, NULL, NULL);
 		}
 
 	if (button == MOUSE_LEFT && state == MOUSE_UP)
 		if (hooked == w) {
-			w->state = WSTATE_HOVERED;
 			unhook();
+			w->clicked = (w->state == WSTATE_PRESSED);
+			w->state = (w->clicked ? WSTATE_HOVERED : WSTATE_NORMAL);
 		}
 }
+
+void wbutton_drag(WButton * w, int x, int y)
+{
+	if (hovertest_box(x, y, w->x, w->y, w->w, w->h))
+		w->state = WSTATE_PRESSED;
+	else
+		w->state = WSTATE_NORMAL;
+}
+
 
 void wbutton_hover(WButton * w, int x, int y)
 {

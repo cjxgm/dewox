@@ -51,6 +51,12 @@ void window_init()
 	
 	LOG_INFO("[window] set up bg color\n");
 	glClearColor(COLOR_MAIN_BG, 1.0f);
+
+	LOG_INFO("[window] set up anti-aliasing\n");
+	glEnable(GL_LINE_SMOOTH);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 }
 
 void window_run()
