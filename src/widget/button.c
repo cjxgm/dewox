@@ -13,6 +13,7 @@ void wbutton_draw(WButton * w)
 			case WSTATE_NORMAL:  glColor3f(COLOR_WBUTTON_NORMAL1);  break;
 			case WSTATE_HOVERED: glColor3f(COLOR_WBUTTON_HOVERED1); break;
 			case WSTATE_PRESSED: glColor3f(COLOR_WBUTTON_PRESSED1); break;
+			case WSTATE_SELECTED:glColor3f(COLOR_WBUTTON_SELECTED1);break;
 			default: break;
 		}
 		glVertex2f(w->x + w->w, w->y);
@@ -22,6 +23,7 @@ void wbutton_draw(WButton * w)
 			case WSTATE_NORMAL:  glColor3f(COLOR_WBUTTON_NORMAL2);  break;
 			case WSTATE_HOVERED: glColor3f(COLOR_WBUTTON_HOVERED2); break;
 			case WSTATE_PRESSED: glColor3f(COLOR_WBUTTON_PRESSED2); break;
+			case WSTATE_SELECTED:glColor3f(COLOR_WBUTTON_SELECTED2);break;
 			default: break;
 		}
 		glVertex2f(w->x, w->y + w->h);
@@ -32,6 +34,7 @@ void wbutton_draw(WButton * w)
 		case WSTATE_NORMAL:  glColor3f(COLOR_WBUTTON_NORMAL3);  break;
 		case WSTATE_HOVERED: glColor3f(COLOR_WBUTTON_HOVERED3); break;
 		case WSTATE_PRESSED: glColor3f(COLOR_WBUTTON_PRESSED3); break;
+		case WSTATE_SELECTED:glColor3f(COLOR_WBUTTON_SELECTED3);break;
 		default: break;
 	}
 	draw_string_centered(w->x + w->w/2, w->y + (w->h-16)/2, w->w,

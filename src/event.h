@@ -15,6 +15,9 @@ void hook(void * widget, ClickFunc click,
 void unhook();
 
 
+void event_init();
+
+
 void event_click(int button, int state, int x, int y);
 void event_drag(int x, int y);
 void event_hover(int x, int y);

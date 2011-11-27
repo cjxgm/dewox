@@ -13,12 +13,11 @@ static DragFunc  hook_drag  = NULL;
 static HoverFunc hook_hover = NULL;
 static KeyFunc   hook_key   = NULL;
 
-//					 label		x	 y	  w	  h
-static WButton btn[] = {
-	{"Hello!", 200, 300, 80, 20},
-	{"World!", 300, 300, 80, 25},
-	{"test==", 400, 300, 80, 30},
+static WRadioEntry tabs[] = {
+	"Hello,", "World!", "test==", 0
 };
+//					 		  default	x  y  w		h
+static WRadio tab_switcher = {0,		100, 200, 200, 20};
 
 
 
@@ -42,6 +41,14 @@ void unhook()
 
 
 
+void event_init()
+{
+	wradio_new(&tab_switcher, tabs);
+}
+
+
+
+
 void event_click(int button, int state, int x, int y)
 {
 	if (hooked) {
@@ -49,9 +56,7 @@ void event_click(int button, int state, int x, int y)
 		return;
 	}
 
-	int i;
-	for (i=0; i<LEN(btn); i++)
-		wbutton_click(&btn[i], button, state, x, y);
+	wradio_click(&tab_switcher, button, state, x, y);
 }
 
 void event_drag(int x, int y)
@@ -69,9 +74,7 @@ void event_hover(int x, int y)
 		return;
 	}
 
-	int i;
-	for (i=0; i<LEN(btn); i++)
-		wbutton_hover(&btn[i], x, y);
+	wradio_hover(&tab_switcher, x, y);
 }
 
 void event_key(unsigned char k)
@@ -84,8 +87,6 @@ void event_key(unsigned char k)
 
 void event_draw(int w, int h)
 {
-	int i;
-	for (i=0; i<LEN(btn); i++)
-		wbutton_draw(&btn[i]);
+	wradio_draw(&tab_switcher);
 }
 
