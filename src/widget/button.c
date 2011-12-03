@@ -8,6 +8,8 @@
 
 void wbutton_draw(WButton * w)
 {
+	if (w->w < 0) return;
+
 	glBegin(GL_QUADS);
 		switch (w->state) {
 			case WSTATE_NORMAL:  glColor3f(COLOR_WBUTTON_NORMAL1);  break;
@@ -67,6 +69,8 @@ void wbutton_drag(WButton * w, int x, int y)
 
 void wbutton_hover(WButton * w, int x, int y)
 {
+	if (w->w < 0) return;
+
 	if (hovertest_box(x, y, w->x, w->y, w->w, w->h))
 		w->state = WSTATE_HOVERED;
 	else

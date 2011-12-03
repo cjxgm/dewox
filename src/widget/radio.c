@@ -48,6 +48,11 @@ void wradio_draw(WRadio * w)
 
 	float we = w->w / (float)n;		// w[idth] e[ach]
 
+	if (we < 10.0f) {
+		if (we > 0) draw_border(w->x, w->y, w->w, w->h);
+		return;
+	}
+
 	int i;
 	for (i=0; w->items[i]; i++)
 		draw_radio_button(w->x + i*we, w->y, we, w->h,
@@ -74,10 +79,13 @@ void wradio_hover(WRadio * w, int x, int y)
 	while (w->items[n]) n++;
 	if (!n) return;
 
+	w->state = WSTATE_NORMAL;
+
 	float we = w->w / (float)n;		// w[idth] e[ach]
 
+	if (we < 10.0f) return;
+
 	int i;
-	w->state = WSTATE_NORMAL;
 	for (i=0; i<n; i++) {
 		if (i == w->selected) continue;
 		if (hovertest_box(x, y, w->x + i*we, w->y, we, w->h)) {

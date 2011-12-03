@@ -7,9 +7,9 @@ OS           : Linux
 Compiler     : gcc or clang
 Dependencies : OpenGL, OpenAL, GLUT, scons
 
-~~~~~~~~~~~~~~
- INSTALLATION
-~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+ COMPILATION
+~~~~~~~~~~~~~
 It's quite simple once you get all the requirements worked correctly.
 Just type following command, then you can compile it.
 
