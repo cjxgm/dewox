@@ -13,11 +13,11 @@ static DragFunc  hook_drag  = NULL;
 static HoverFunc hook_hover = NULL;
 static KeyFunc   hook_key   = NULL;
 
-static WRadioEntry tabs[] = {
-	"Hello,", "World!", "test==", 0
+static WRadioItem tabs[] = {
+	"Hello,", "World!", "test==", "VERY VERY LONG", 0
 };
-//					 		  default	x  y  w		h
-static WRadio tab_switcher = {0,		100, 200, 200, 20};
+//					 		  default	x	  y	  w		h	items
+static WRadio tab_switcher = {0,		100, 200, 250, 20, tabs};
 
 
 
@@ -43,7 +43,6 @@ void unhook()
 
 void event_init()
 {
-	wradio_new(&tab_switcher, tabs);
 }
 
 

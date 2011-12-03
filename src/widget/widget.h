@@ -8,13 +8,13 @@ typedef enum WState
 	WSTATE_NORMAL,
 	WSTATE_HOVERED,
 	WSTATE_PRESSED,
-	WSTATE_SELECTED,
 }
 WState;
 
 
-int hovertest_box(int mx, int my, int x, int y, int w, int h);
-void draw_border(int x, int y, int w, int h);
+float hovertest_box(float mx, float my,
+		float x, float y, float w, float h);
+void draw_border(float x, float y, float w, float h);
 
 #endif
 

@@ -2,13 +2,15 @@
 #include <GL/gl.h>
 #include "widget.h"
 #include "../config.h"
+#include "../font.h"
 
-int hovertest_box(int mx, int my, int x, int y, int w, int h)
+float hovertest_box(float mx, float my,
+		float x, float y, float w, float h)
 {
 	return ((mx > x && mx < x+w) && (my > y && my < y+h));
 }
 
-void draw_border(int x, int y, int w, int h)
+void draw_border(float x, float y, float w, float h)
 {
 	glLineWidth(0.1f);
 	glColor3f(COLOR_BORDER);

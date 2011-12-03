@@ -1,62 +1,90 @@
 
 #include <GL/gl.h>
-#include <stdlib.h>
 #include "radio.h"
-#include "button.h"
 #include "../window.h"
+#include "../config.h"
 #include "../event.h"
+#include "../font.h"
 
-void wradio_new(WRadio * w, WRadioEntry entries[])
+static void draw_radio_button(float x, float y, float w, float h,
+								const char * label, WState state)
 {
-	for (w->btn_cnt=0; entries[w->btn_cnt]; w->btn_cnt++) {}
-	w->btns = calloc(sizeof(WRadio), w->btn_cnt);
-	
-	int i;
-	for (i=0; i<w->btn_cnt; i++) {
-		w->btns[i].label = entries[i];
-		w->btns[i].x = w->x + i * w->w / w->btn_cnt;
-		w->btns[i].y = w->y;
-		w->btns[i].w = w->w / w->btn_cnt;
-		w->btns[i].h = w->h;
+	glBegin(GL_QUADS);
+		switch (state) {
+			case WSTATE_NORMAL:  glColor3f(COLOR_WRADIO_NORMAL1);  break;
+			case WSTATE_HOVERED: glColor3f(COLOR_WRADIO_HOVERED1); break;
+			case WSTATE_PRESSED: glColor3f(COLOR_WRADIO_PRESSED1); break;
+			default: break;
+		}
+		glVertex2f(x + w, y);
+		glVertex2f(x, y);
+
+		switch (state) {
+			case WSTATE_NORMAL:  glColor3f(COLOR_WRADIO_NORMAL2);  break;
+			case WSTATE_HOVERED: glColor3f(COLOR_WRADIO_HOVERED2); break;
+			case WSTATE_PRESSED: glColor3f(COLOR_WRADIO_PRESSED2); break;
+			default: break;
+		}
+		glVertex2f(x, y + h);
+		glVertex2f(x + w, y + h);
+	glEnd();
+
+	switch (state) {
+		case WSTATE_NORMAL:  glColor3f(COLOR_WRADIO_NORMAL3);  break;
+		case WSTATE_HOVERED: glColor3f(COLOR_WRADIO_HOVERED3); break;
+		case WSTATE_PRESSED: glColor3f(COLOR_WRADIO_PRESSED3); break;
+		default: break;
 	}
-	w->btns[w->selected].state = WSTATE_SELECTED;
+	draw_string_centered(x + w/2, y + (h-16)/2, w,
+							label, 0);
+	draw_border(x, y, w, h);
 }
 
 void wradio_draw(WRadio * w)
 {
+	int n = 0;
+	while (w->items[n]) n++;
+	if (!n) return;
+
+	float we = w->w / (float)n;		// w[idth] e[ach]
+
 	int i;
-	for (i=0; i<w->btn_cnt; i++) {
-		if (w->btns[i].clicked) {
-			w->btns[i].clicked = 0;
-			w->btns[w->selected].state = WSTATE_NORMAL;
-			w->selected = i;
-			w->btns[i].state = WSTATE_SELECTED;
-		}
-		wbutton_draw(&w->btns[i]);
-	}
+	for (i=0; w->items[i]; i++)
+		draw_radio_button(w->x + i*we, w->y, we, w->h,
+				w->items[i], (i==w->selected ? WSTATE_PRESSED :
+								(i==w->tmp ? w->state: WSTATE_NORMAL)));
 }
 
 void wradio_click(WRadio * w, int button, int state, int x, int y)
 {
-	int i;
-	for (i=0; i<w->btn_cnt; i++)
-		if (i != w->selected)
-			wbutton_click(&w->btns[i], button, state, x, y);
-}
+	if (button == MOUSE_LEFT && state == MOUSE_DOWN)
+		if (w->state == WSTATE_HOVERED) {
+			w->selected = w->tmp;
+			hook(w, (ClickFunc)&wradio_click, NULL, NULL, NULL);
+		}
 
-void wradio_drag(WRadio * w, int x, int y)
-{
-	int i;
-	for (i=0; i<w->btn_cnt; i++)
-		if (i != w->selected)
-			wbutton_drag(&w->btns[i], x, y);
+	if (button == MOUSE_LEFT && state == MOUSE_UP)
+		if (hooked == w)
+			unhook();
 }
 
 void wradio_hover(WRadio * w, int x, int y)
 {
+	int n = 0;
+	while (w->items[n]) n++;
+	if (!n) return;
+
+	float we = w->w / (float)n;		// w[idth] e[ach]
+
 	int i;
-	for (i=0; i<w->btn_cnt; i++)
-		if (i != w->selected)
-			wbutton_hover(&w->btns[i], x, y);
+	w->state = WSTATE_NORMAL;
+	for (i=0; i<n; i++) {
+		if (i == w->selected) continue;
+		if (hovertest_box(x, y, w->x + i*we, w->y, we, w->h)) {
+			w->tmp = i;
+			w->state = WSTATE_HOVERED;
+			break;
+		}
+	}
 }
 

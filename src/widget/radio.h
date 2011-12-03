@@ -3,31 +3,28 @@
 #define __WIDGET_RADIO__
 
 #include "widget.h"
-#include "button.h"
 
 
 
 
-typedef const char * WRadioEntry;
+typedef const char * WRadioItem;
 
 typedef struct WRadio
 {
 	int selected;
-	int x, y, w, h;
+	float x, y, w, h;
+	WRadioItem * items;
 	WState state;
 
-	WButton * btns;
-	int btn_cnt;
+	int tmp;
 }
 WRadio;
 
 
 
 
-void wradio_new  (WRadio * w, WRadioEntry entries[]);
 void wradio_draw (WRadio * w);
 void wradio_click(WRadio * w, int button, int state, int x, int y);
-void wradio_drag (WRadio * w, int x, int y);
 void wradio_hover(WRadio * w, int x, int y);
 
 #endif

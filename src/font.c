@@ -7,7 +7,7 @@
 
 
 
-void draw_char(int x, int y, unsigned char ch)
+void draw_char(float x, float y, unsigned char ch)
 {
 	int row, col;
 	glPointSize(1);
@@ -21,26 +21,27 @@ void draw_char(int x, int y, unsigned char ch)
 	glEnd();
 }
 
-void draw_string(int x, int y, int w, const char * str, int spacing)
+void draw_string(float x, float y, float w,
+		const char * str, float spacing)
 {
-	int i = x;
+	float i = x;
 	while (*str) {
-		if (i > x+w-8) break;
+		if (i > x+w-8.0f) break;
 		draw_char(i, y, *str++);
-		i += 8 + spacing;
+		i += 8.0f + spacing;
 	}
 }
 
-void draw_string_centered(int x, int y, int w,
-		const char * str, int spacing)
+void draw_string_centered(float x, float y, float w,
+		const char * str, float spacing)
 {
-	int i = x - (strlen(str)*(8+spacing)-8)/2;
+	float i = x - (strlen(str)*(8.0f+spacing)-8.0f)/2.0f;
 	while (*str) {
-		if (i > x+w/2-8) break;
-		if (i >= x-w/2)
+		if (i > x+w/2.0f-8.0f) break;
+		if (i >= x-w/2.0f)
 			draw_char(i, y, *str);
 		str++;
-		i += 8 + spacing;
+		i += 8.0f + spacing;
 	}
 }
 

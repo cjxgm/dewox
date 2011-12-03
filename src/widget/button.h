@@ -7,7 +7,7 @@
 typedef struct WButton
 {
 	const char * label;
-	int x, y, w, h;
+	float x, y, w, h;
 	char clicked;
 	WState state;
 }
