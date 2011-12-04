@@ -84,8 +84,11 @@ static void msg_click(void * w, int button, int state, int x, int y)
 		return;
 	}
 	if (button == MOUSE_LEFT && state == MOUSE_UP
-		&& msg_state == WSTATE_HOVERED && msg_act)
-		msg_act(w);
+		&& msg_state == WSTATE_HOVERED) {
+		msg_widget = NULL;
+		unhook();
+		if (msg_act) msg_act(w);
+	}
 }
 
 static void msg_hover(void * w, int x, int y)

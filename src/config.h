@@ -6,6 +6,7 @@
 // version info
 #define APPNAME				"Dewox"
 #define APPVER				"1.4"
+#define APPAUTHORS			"eXerigumo Clanjor"
 #define VERSION_STRING		APPNAME " " APPVER
 
 

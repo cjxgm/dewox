@@ -35,7 +35,7 @@ void draw_string(float x, float y, float w,
 void draw_string_centered(float x, float y, float w,
 		const char * str, float spacing)
 {
-	float i = x - (strlen(str)*(8.0f+spacing)-8.0f)/2.0f;
+	float i = x - strlen(str)*(8.0f+spacing)/2.0f;
 	while (*str) {
 		if (i > x+w/2.0f-8.0f) break;
 		if (i >= x-w/2.0f)

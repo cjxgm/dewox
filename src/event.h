@@ -21,18 +21,18 @@ void msgbox(void * widget, ActFunc act,
 
 
 void event_click(int button, int state, int x, int y);
-void event_drag(int x, int y);
+void event_drag (int x, int y);
 void event_hover(int x, int y);
-void event_key(unsigned char k);
-void event_draw(int w, int h);
+void event_key  (unsigned char k);
+void event_draw (int w, int h);
 
 
 // Implemented in OTHER file. For now, dewox.c
 void app_click(int button, int state, int x, int y);
-void app_drag(int x, int y);
+void app_drag (int x, int y);
 void app_hover(int x, int y);
-void app_key(unsigned char k);
-void app_draw(int w, int h);
+void app_key  (unsigned char k);
+void app_draw (int w, int h);
 
 #endif
 

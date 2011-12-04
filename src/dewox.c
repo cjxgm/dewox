@@ -1,20 +1,28 @@
 
 #include <stdlib.h>
+#include <GL/gl.h>
 
 #include "event.h"
 #include "common.h"
+#include "font.h"
+#include "config.h"
 #include "widget/widgets.h"
+
+// tabs
+#include "info/info.h"
+#include "scene/scene.h"
+#include "track/track.h"
+#include "pref/pref.h"
+#include "uitest/uitest.h"
 
 
 
 
 static WRadioItem tabs[] = {
-	"Hello,", "World!", "test==", "VERY VERY LONG", NULL
+	"Info", "Scene", "Track", "Preferences", "UI Test", NULL
 };
-//					 		  default	x	  y	  w		h	items
-static WRadio tab_switcher = {0,		100, 200, 250, 20, tabs};
-
-static WButton btn = {"Quit", 100, 230, 250, 20};
+//					 		  default	x  y  w  h   items
+static WRadio tab_switcher = {0,		8, 0, 0, 20, tabs};
 
 
 
@@ -30,36 +38,65 @@ static void act_quit(void * w)
 void app_click(int button, int state, int x, int y)
 {
 	wradio_click(&tab_switcher, button, state, x, y);
-	wbutton_click(&btn, button, state, x, y);
+	switch (tab_switcher.selected) {
+	case 0: info_click  (button, state, x, y); break;
+	case 1: scene_click (button, state, x, y); break;
+	case 2: track_click (button, state, x, y); break;
+	case 3: pref_click  (button, state, x, y); break;
+	case 4: uitest_click(button, state, x, y); break;
+	}
 }
 
 void app_drag(int x, int y)
 {
+	switch (tab_switcher.selected) {
+	case 0: info_drag  (x, y); break;
+	case 1: scene_drag (x, y); break;
+	case 2: track_drag (x, y); break;
+	case 3: pref_drag  (x, y); break;
+	case 4: uitest_drag(x, y); break;
+	}
 }
 
 void app_hover(int x, int y)
 {
 	wradio_hover(&tab_switcher, x, y);
-	wbutton_hover(&btn, x, y);
+	switch (tab_switcher.selected) {
+	case 0: info_hover  (x, y); break;
+	case 1: scene_hover (x, y); break;
+	case 2: track_hover (x, y); break;
+	case 3: pref_hover  (x, y); break;
+	case 4: uitest_hover(x, y); break;
+	}
 }
 
 void app_key(unsigned char k)
 {
-	if (k == '\e')
-		msgbox(&btn, act_quit, "Quit? You pressed ESC for it.", "Sure");
+	if (k == '\e') {
+		msgbox(&k, act_quit, "Quit?", "Quit Dewox");
+		return;
+	}
+	switch (tab_switcher.selected) {
+	case 0: info_key  (k); break;
+	case 1: scene_key (k); break;
+	case 2: track_key (k); break;
+	case 3: pref_key  (k); break;
+	case 4: uitest_key(k); break;
+	}
 }
 
 void app_draw(int w, int h)
 {
-	tab_switcher.w = w-200;
-	btn.w = w-200;
-
+	tab_switcher.y = h - 28;
+	tab_switcher.w = w - 16;
 	wradio_draw(&tab_switcher);
-	wbutton_draw(&btn);
 
-	if (btn.clicked) {
-		btn.clicked = 0;
-		msgbox(&btn, act_quit, "Quit?", "Sure???? So LONG A Message!");
+	switch (tab_switcher.selected) {
+	case 0: info_draw  (w, h-36); break;
+	case 1: scene_draw (w, h-36); break;
+	case 2: track_draw (w, h-36); break;
+	case 3: pref_draw  (w, h-36); break;
+	case 4: uitest_draw(w, h-36); break;
 	}
 }
 

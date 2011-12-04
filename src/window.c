@@ -1,4 +1,5 @@
 
+#include <math.h>
 #include "window.h"
 #include "common.h"
 #include "config.h"
@@ -7,13 +8,14 @@
 
 
 
-static int win_w = 800;
-static int win_h = 600;
+static char disabled = 0;
+static int  win_w = 800;
+static int  win_h = 600;
 
 static void click(int button, int state, int x, int y);
-static void drag(int x, int y);
+static void drag (int x, int y);
 static void hover(int x, int y);
-static void key(unsigned char k, int x, int y);
+static void key  (unsigned char k, int x, int y);
 static void resize(int w, int h);
 static void update(int unused);
 static void display();
@@ -70,24 +72,28 @@ void window_run()
 
 void click(int button, int state, int x, int y)
 {
+	if (disabled) return;
 	event_click(button, state, x, y);
 	glutPostRedisplay();
 }
 
 void drag(int x, int y)
 {
+	if (disabled) return;
 	event_drag(x, y);
 	glutPostRedisplay();
 }
 
 void hover(int x, int y)
 {
+	if (disabled) return;
 	event_hover(x, y);
 	glutPostRedisplay();
 }
 
 void key(unsigned char k, int x, int y)
 {
+	if (disabled) return;
 	event_key(k);
 	glutPostRedisplay();
 }
@@ -102,6 +108,12 @@ void resize(int w, int h)
 {
 	win_w = w;
 	win_h = h;
+
+	if (w < 640 || h < 480)
+		disabled = 1;
+	else
+		disabled = 0;
+
 	glViewport(0, 0, w, h);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -116,8 +128,21 @@ void resize(int w, int h)
 
 void display()
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	event_draw(win_w, win_h);
+	if (disabled) {
+		int n = win_w*win_h/2000 + 1;
+		glBegin(GL_LINE_LOOP);
+		while (n--) {
+			float t = rand() & 1;
+			t = t/3.0f + 0.6666f;
+			glColor3f(t, t, t);
+			glVertex2f(rand() % win_w, rand() % win_h);
+		}
+		glEnd();
+	}
+	else {
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		event_draw(win_w, win_h);
+	}
 	glutSwapBuffers();
 }
 
