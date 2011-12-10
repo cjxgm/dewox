@@ -6,9 +6,13 @@
 
 typedef struct WButton
 {
-	const char * label;
 	float x, y, w, h;
+	const char * label;
+	char toggleable;
+
+	char toggled;
 	char clicked;
+
 	WState state;
 }
 WButton;

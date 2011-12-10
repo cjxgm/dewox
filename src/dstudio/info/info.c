@@ -5,10 +5,10 @@
 #include "widget/widgets.h"
 
 static WButton btns[] = {
-	{"Name: "     APPNAME   , 18, 18, 0, 20},
-	{"Ver: "      APPVER    , 18, 42, 0, 20},
-	{"Author(s): "APPAUTHORS, 18, 66, 0, 20},
-	{"Inspired by: .werkkzeug, Komposter, Blender", 18, 90, 0, 20},
+	{18, 18, 0, 20, "Name: "     APPNAME   },
+	{18, 42, 0, 20, "Ver: "      APPVER    },
+	{18, 66, 0, 20, "Author(s): "APPAUTHORS},
+	{18, 90, 0, 20, "Inspired by: .werkkzeug, Komposter, Blender"},
 };
 
 void info_click(int button, int state, int x, int y)

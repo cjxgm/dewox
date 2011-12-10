@@ -21,8 +21,8 @@
 static WRadioItem tabs[] = {
 	"Info", "Scene", "Track", "Preferences", "UI Test", NULL
 };
-//					 		  default	x  y  w  h   items
-static WRadio tab_switcher = {0,		8, 0, 0, 20, tabs};
+//					 		  x  y  w  h   selected   items
+static WRadio tab_switcher = {8, 0, 0, 20, 0,         tabs};
 
 
 

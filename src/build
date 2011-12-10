@@ -1,7 +1,15 @@
 #!/bin/bash
+
+debug=0
 if [ "$1" == '-' ]; then
-	../build/dstudio
-else
-	cd ..
-	scons $*
+	debug=1
+	shift
 fi
+
+cd ..
+scons $*
+
+if [ "$debug" == '1' ]; then
+	./build/dstudio
+fi
+

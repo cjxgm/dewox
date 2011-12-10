@@ -17,6 +17,9 @@ void wbutton_draw(WButton * w)
 			case WSTATE_PRESSED: glColor3f(COLOR_WBUTTON_PRESSED1); break;
 			default: break;
 		}
+		if (w->toggleable && w->toggled)
+			glColor3f(COLOR_WBUTTON_PRESSED1);
+
 		glVertex2f(w->x + w->w, w->y);
 		glVertex2f(w->x, w->y);
 
@@ -26,6 +29,9 @@ void wbutton_draw(WButton * w)
 			case WSTATE_PRESSED: glColor3f(COLOR_WBUTTON_PRESSED2); break;
 			default: break;
 		}
+		if (w->toggleable && w->toggled)
+			glColor3f(COLOR_WBUTTON_PRESSED2);
+
 		glVertex2f(w->x, w->y + w->h);
 		glVertex2f(w->x + w->w, w->y + w->h);
 	glEnd();
@@ -36,6 +42,9 @@ void wbutton_draw(WButton * w)
 		case WSTATE_PRESSED: glColor3f(COLOR_WBUTTON_PRESSED3); break;
 		default: break;
 	}
+	if (w->toggleable && w->toggled)
+		glColor3f(COLOR_WBUTTON_PRESSED3);
+
 	draw_string_centered(w->x + w->w/2.0f, w->y + (w->h-16.0f)/2.0f, w->w,
 							w->label, 0.0f);
 	draw_border(w->x, w->y, w->w, w->h);
@@ -53,6 +62,7 @@ void wbutton_click(WButton * w, int button, int state, int x, int y)
 	if (button == MOUSE_LEFT && state == MOUSE_UP)
 		if (hooked == w) {
 			unhook();
+			if (w->toggleable) w->toggled = !w->toggled;
 			w->clicked = (w->state == WSTATE_PRESSED);
 			w->state = (w->clicked ? WSTATE_HOVERED : WSTATE_NORMAL);
 		}

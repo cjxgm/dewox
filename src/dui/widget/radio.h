@@ -11,8 +11,8 @@ typedef const char * WRadioItem;
 
 typedef struct WRadio
 {
-	int selected;
 	float x, y, w, h;
+	int selected;
 	WRadioItem * items;
 	WState state;
 
