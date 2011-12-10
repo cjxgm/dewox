@@ -1,0 +1,7 @@
+
+Import('env')
+env.Program(target = '../../build/dstudio', \
+			source = Glob('*.c') + Glob('*/*.c'), \
+			LIBS   = env['LIBS'] + Split('dui dutil'), \
+			LIBPATH= Split('../dui ../dutil'))
+

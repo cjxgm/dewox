@@ -1,0 +1,5 @@
+
+Import('env')
+env.Library(target = 'dutil', \
+			source = Glob('*.c') + Glob('*/*.c'))
+

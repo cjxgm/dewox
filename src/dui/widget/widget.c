@@ -1,8 +1,8 @@
 
 #include <GL/gl.h>
 #include "widget.h"
-#include "../config.h"
-#include "../font.h"
+#include "config.h"
+#include "font.h"
 
 float hovertest_box(float mx, float my,
 		float x, float y, float w, float h)

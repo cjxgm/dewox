@@ -2,10 +2,10 @@
 #include <GL/gl.h>
 
 #include "uitest.h"
-#include "../font.h"
-#include "../event.h"
-#include "../common.h"
-#include "../widget/widgets.h"
+#include "font.h"
+#include "event.h"
+#include "common.h"
+#include "widget/widgets.h"
 
 
 

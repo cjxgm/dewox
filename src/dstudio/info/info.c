@@ -1,8 +1,8 @@
 
 #include "info.h"
-#include "../config.h"
-#include "../common.h"
-#include "../widget/widgets.h"
+#include "config.h"
+#include "common.h"
+#include "widget/widgets.h"
 
 static WButton btns[] = {
 	{"Name: "     APPNAME   , 18, 18, 0, 20},
