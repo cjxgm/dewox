@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <unistd.h>
 
 #include "stacking.h"
 
@@ -11,10 +12,17 @@
 #define NULL ((void *)0)
 #endif
 
+#define MAP(V,SF,ST,DF,DT) \
+	(((float)(V)-(float)(SF)) \
+	 / ((float)(ST)-(float)(SF)) \
+	 * ((float)(DT)-(float)(DF)) \
+	 + (float)(DF))
+
 
 // in main.c
 extern int win_w;
 extern int win_h;
+extern FILE * dsp;
 
 // in widget.c
 int hovertest_box(int mx, int my, int x, int y, int w, int h);
@@ -50,6 +58,8 @@ static int  check_error(int x, int y, int w);
 opr oprs[OPRS_SIZE];
 int oprcnt = 0;
 
+int playing = -1;
+
 static int cursor_x = 20;
 static int cursor_y = 10;
 static int left_down = 0;
@@ -59,6 +69,30 @@ static int dragging = 0;
 static int dragging_mode = 0;	// 0: move    1: resize
 static int dragging_x, dragging_y;
 
+
+void * thread_play(int * p)
+{
+	int tt = 0;
+	int len = sizeof(oprs[playing].oi.rendered)
+			/ sizeof(oprs[playing].oi.rendered[0]);
+	while (1) {
+		//fprintf(stderr, "%d\n", *p);
+		if (*p == -1) continue;
+		int i;
+		for (i=0; i<len; i++) {
+			unsigned char t = MAP(oprs[*p].oi.rendered[i],
+					-32768, 32767, 0, 255);
+			fwrite(&t, 1, 1, dsp);
+
+			tt++;
+			if (tt == 14400) {
+				tt = 0;
+				sleep(1);
+			}
+		}
+	}
+	return NULL;
+}
 
 void click(int btn, int stt, int x, int y)
 {
@@ -216,6 +250,20 @@ void draw()
 	glVertex2f(200, win_h);
 	glEnd();
 
+	if (playing != -1) {
+		glLineWidth(1);
+		glColor3f(0.5, 0.5, 1);
+		glBegin(GL_LINE_STRIP);
+		int i;
+		int len = sizeof(oprs[playing].oi.rendered)
+			/sizeof(oprs[playing].oi.rendered[0]);
+		for (i=0; i<len; i++)
+			glVertex2f(MAP(i, 0, len, 10, 190),
+					MAP(oprs[playing].oi.rendered[i],
+						-32768, 32767, 100, 200));
+		glEnd();
+	}
+
 	draw_cursor(cursor_x*20, cursor_y*20);
 	if (is_menu) menu_draw();
 }
@@ -234,7 +282,7 @@ void keypress(int key, int x, int y)
 		exit(0);
 
 	if (x<200) return;
-	if (key == 'a') {// deselect all
+	if (key == 'a') {// [de]select all
 		int i;
 
 		if (selectcnt) {
@@ -246,6 +294,16 @@ void keypress(int key, int x, int y)
 			for (i=0; i<oprcnt; i++)
 				oprs[i].selected = 1;
 			selectcnt = oprcnt;
+		}
+	}
+	else if (key == 's') {// play it
+		if (!selectcnt) {
+			playing = -1;
+		}
+		else {
+			int i;
+			for (i=0; !oprs[i].selected; i++) {}
+			playing = i;
 		}
 	}
 }
