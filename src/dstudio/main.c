@@ -1,6 +1,6 @@
 
 #include "config.h"
-#include "common.h"
+#include "dutil.h"
 #include "window.h"
 #include "event.h"
 

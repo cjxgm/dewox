@@ -1,6 +1,8 @@
 
 20111210-20111211:	eXerigumo Clanjor <cjxgm@126.com>
-			Re-adjusted source tree!
+			Re-adjusted source tree
+			Finished range box
+			Set UITest page to default page
 
 20111126-20111203:	eXerigumo Clanjor <cjxgm@126.com>
 			Rewrote according to the UI Design.
@@ -10,6 +12,6 @@
 20111029-20111105:	eXerigumo Clanjor <cjxgm@126.com>
 			Rewrote in C.
 			Inspired by Komposter, Dewox is redesigned.
-			It includes a tracker now!
+			It is decided to include a tracker now!
 			Use scons to build.
 

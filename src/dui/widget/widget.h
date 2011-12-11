@@ -8,6 +8,7 @@ typedef enum WState
 	WSTATE_NORMAL,
 	WSTATE_HOVERED,
 	WSTATE_PRESSED,
+	WSTATE_EDITING,
 }
 WState;
 

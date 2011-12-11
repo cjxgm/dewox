@@ -62,7 +62,8 @@ void wbutton_click(WButton * w, int button, int state, int x, int y)
 	if (button == MOUSE_LEFT && state == MOUSE_UP)
 		if (hooked == w) {
 			unhook();
-			if (w->toggleable) w->toggled = !w->toggled;
+			if (w->toggleable && w->state == WSTATE_PRESSED)
+				w->toggled = !w->toggled;
 			w->clicked = (w->state == WSTATE_PRESSED);
 			w->state = (w->clicked ? WSTATE_HOVERED : WSTATE_NORMAL);
 		}

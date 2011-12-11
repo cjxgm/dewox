@@ -1,7 +1,7 @@
 
 #include "info.h"
 #include "config.h"
-#include "common.h"
+#include "dutil.h"
 #include "widget/widgets.h"
 
 static WButton btns[] = {

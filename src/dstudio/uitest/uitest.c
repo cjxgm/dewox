@@ -4,7 +4,7 @@
 #include "uitest.h"
 #include "font.h"
 #include "event.h"
-#include "common.h"
+#include "dutil.h"
 #include "widget/widgets.h"
 
 
@@ -23,6 +23,10 @@ static WRadioItem radio_items[] = {
 };
 static WRadio radio = {.selected = 1, .items = radio_items};
 
+static WRange rngs[] = {
+	{.min = -10, .max = 100, .step = 0.1, .value = 20.2},
+	{.min = 12, .max = 99.5, .step = 1e-3, .value = 20.2},
+};
 
 
 
@@ -31,6 +35,8 @@ void uitest_click(int button, int state, int x, int y)
 	int i;
 	for (i=0; i<LEN(btns); i++)
 		wbutton_click(&btns[i], button, state, x, y);
+	for (i=0; i<LEN(rngs); i++)
+		wrange_click(&rngs[i], button, state, x, y);
 	wradio_click(&radio, button, state, x, y);
 }
 
@@ -43,6 +49,8 @@ void uitest_hover(int x, int y)
 	int i;
 	for (i=0; i<LEN(btns); i++)
 		wbutton_hover(&btns[i], x, y);
+	for (i=0; i<LEN(rngs); i++)
+		wrange_hover(&rngs[i], x, y);
 	wradio_hover(&radio, x, y);
 }
 
@@ -112,7 +120,19 @@ void uitest_draw(int w, int h)
 	radio.h = 20;
 	wradio_draw(&radio);
 
-	
+	rngs[0].x = 22;
+	rngs[0].y = 320;
+	rngs[0].w = t-12;
+	rngs[0].h = 20;
+
+	rngs[1].x = 22;
+	rngs[1].y = 344;
+	rngs[1].w = t-12;
+	rngs[1].h = 20;
+
+	for (i=0; i<LEN(rngs); i++)
+		wrange_draw(&rngs[i]);
+
 
 	// button event proccess
 	if (btns[2].clicked) {

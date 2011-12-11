@@ -5,6 +5,7 @@
 #include "widget.h"
 #include "button.h"
 #include "radio.h"
+#include "range.h"
 
 #endif
 

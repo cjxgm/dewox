@@ -3,7 +3,7 @@
 #include <GL/gl.h>
 
 #include "event.h"
-#include "common.h"
+#include "dutil.h"
 #include "font.h"
 #include "config.h"
 #include "widget/widgets.h"
@@ -22,7 +22,7 @@ static WRadioItem tabs[] = {
 	"Info", "Scene", "Track", "Preferences", "UI Test", NULL
 };
 //					 		  x  y  w  h   selected   items
-static WRadio tab_switcher = {8, 0, 0, 20, 0,         tabs};
+static WRadio tab_switcher = {8, 0, 0, 20, 4,         tabs};
 
 
 
