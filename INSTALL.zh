@@ -4,8 +4,8 @@ dewox - An RAD [de]momaker inspired by [W]erkkzeug for [O]penGL & Linu[x]
  系统要求
 ~~~~~~~~~~
 操作系统 : Linux
-编译器   : gcc 或 clang
-依赖     : OpenGL, OpenAL, GLUT, scons
+编译器   : gcc
+依赖     : OpenGL, OpenAL, GLUT, bash
 
 ~~~~~~
  编译
@@ -13,7 +13,13 @@ dewox - An RAD [de]momaker inspired by [W]erkkzeug for [O]penGL & Linu[x]
 当你把所有依赖都正确安装好后，编译就是一小 case 了。
 你只要输入以下命令就能编译了：
 
-	scons
+	./cjbs
 
-如果你想对编译进行配置，请输入 'scons -h' 以获得更多信息。
+尝试运行：
+
+	./cjbs -
+
+清理现场：
+
+	./cjbs clean
 

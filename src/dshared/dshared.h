@@ -1,6 +1,6 @@
 
 /************************************************************
- * dewox: main.c
+ * dewox: dshared.h
  *
  * Licensed under GPLv2.
  * ABSOLUTELY NO WARRANTY!
@@ -8,12 +8,9 @@
  * Copyright (C) eXerigumo Clanjor (哆啦比猫/兰威举).
  ************************************************************/
 
-#include "wm.h"
+#ifndef __DSHARED_H
+#define __DSHARED_H
 
-int main()
-{
-	wm_init();
-	wm_mainloop();
-	return 0;
-}
+
+#endif
 

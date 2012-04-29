@@ -4,8 +4,8 @@ dewox - An RAD [de]momaker inspired by [W]erkkzeug for [O]penGL & Linu[x]
  REQUIREMENTS
 ~~~~~~~~~~~~~~
 OS           : Linux
-Compiler     : gcc or clang
-Dependencies : OpenGL, OpenAL, GLUT, scons
+Compiler     : gcc
+Dependencies : OpenGL, OpenAL, GLUT, bash
 
 ~~~~~~~~~~~~~
  COMPILATION
@@ -13,7 +13,13 @@ Dependencies : OpenGL, OpenAL, GLUT, scons
 It's quite simple once you get all the requirements worked correctly.
 Just type following command, then you can compile it.
 
-	scons
+	./cjbs
 
-If you want to configure the compilation, type 'scons -h' for more details.
+Try to run it:
+
+	./cjbs -
+
+Clean things up:
+
+	./cjbs clean
 

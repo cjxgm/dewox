@@ -1,6 +1,6 @@
 
 /************************************************************
- * dewox: main.c
+ * dewox: wm.h
  *
  * Licensed under GPLv2.
  * ABSOLUTELY NO WARRANTY!
@@ -8,12 +8,14 @@
  * Copyright (C) eXerigumo Clanjor (哆啦比猫/兰威举).
  ************************************************************/
 
-#include "wm.h"
+#ifndef __WM_H
+#define __WM_H
 
-int main()
-{
-	wm_init();
-	wm_mainloop();
-	return 0;
-}
+extern int wm_win_w;
+extern int wm_win_h;
+
+void wm_init();
+void wm_mainloop();
+
+#endif
 
