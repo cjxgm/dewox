@@ -1,9 +1,9 @@
 
 #include "pref.h"
-#include "font.h"
-#include "event.h"
-#include "dutil.h"
-#include "widget/widgets.h"
+#include "../../dui/font.h"
+#include "../../dui/event.h"
+#include "../../dutil/dutil.h"
+#include "../../dui/widget/widgets.h"
 
 void pref_click(int button, int state, int x, int y)
 {

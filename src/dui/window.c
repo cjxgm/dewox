@@ -1,7 +1,7 @@
 
 #include <math.h>
 #include "window.h"
-#include "dutil.h"
+#include "../dutil/dutil.h"
 #include "config.h"
 #include "event.h"
 

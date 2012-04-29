@@ -5,7 +5,6 @@
 #include <stdio.h>
 #include <math.h>
 
-
 #ifndef NULL
 # define NULL ((void *)0)
 #endif

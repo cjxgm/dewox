@@ -1,8 +1,8 @@
 
-#include "config.h"
-#include "dutil.h"
-#include "window.h"
-#include "event.h"
+#include "../dui/config.h"
+#include "../dutil/dutil.h"
+#include "../dui/window.h"
+#include "../dui/event.h"
 
 int main()
 {

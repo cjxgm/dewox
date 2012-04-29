@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <GL/gl.h>
 
-#include "event.h"
-#include "dutil.h"
-#include "font.h"
-#include "config.h"
-#include "widget/widgets.h"
+#include "../dui/event.h"
+#include "../dutil/dutil.h"
+#include "../dui/font.h"
+#include "../dui/config.h"
+#include "../dui/widget/widgets.h"
 
 // tabs
 #include "info/info.h"

@@ -3,11 +3,11 @@
 #include <string.h>
 
 #include "range.h"
-#include "window.h"
-#include "config.h"
-#include "dutil.h"
-#include "event.h"
-#include "font.h"
+#include "../window.h"
+#include "../config.h"
+#include "../../dutil/dutil.h"
+#include "../event.h"
+#include "../font.h"
 
 char buf_editing[20] = {0};
 

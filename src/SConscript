@@ -1,6 +1,0 @@
-
-Import('env')
-SConscript('dstudio/SConscript')
-SConscript('dui/SConscript')
-SConscript('dutil/SConscript')
-

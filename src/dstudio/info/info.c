@@ -1,8 +1,8 @@
 
 #include "info.h"
-#include "config.h"
-#include "dutil.h"
-#include "widget/widgets.h"
+#include "../../dui/config.h"
+#include "../../dutil/dutil.h"
+#include "../../dui/widget/widgets.h"
 
 static WButton btns[] = {
 	{18, 18, 0, 20, "Name: "     APPNAME   },

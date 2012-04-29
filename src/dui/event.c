@@ -2,7 +2,7 @@
 #include <string.h>
 
 #include "event.h"
-#include "dutil.h"
+#include "../dutil/dutil.h"
 #include "window.h"
 #include "widget/widget.h"
 

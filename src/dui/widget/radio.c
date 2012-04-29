@@ -1,10 +1,10 @@
 
 #include <GL/gl.h>
 #include "radio.h"
-#include "window.h"
-#include "config.h"
-#include "event.h"
-#include "font.h"
+#include "../window.h"
+#include "../config.h"
+#include "../event.h"
+#include "../font.h"
 
 static void draw_radio_button(float x, float y, float w, float h,
 								const char * label, WState state)

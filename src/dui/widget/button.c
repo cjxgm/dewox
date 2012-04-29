@@ -1,10 +1,10 @@
 
 #include <GL/gl.h>
 #include "button.h"
-#include "window.h"
-#include "config.h"
-#include "event.h"
-#include "font.h"
+#include "../window.h"
+#include "../config.h"
+#include "../event.h"
+#include "../font.h"
 
 void wbutton_draw(WButton * w)
 {
