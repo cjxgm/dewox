@@ -18,5 +18,8 @@ inline void wm_init();
 inline void wm_mainloop();
 inline void wm_require_refresh();
 
+typedef void (WindowRenderFunc)(int w, int h);
+void wm_register_window(const char * name, WindowRenderFunc * render);
+
 #endif
 
