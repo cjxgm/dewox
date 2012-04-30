@@ -13,6 +13,7 @@
 int main()
 {
 	wm_init();
+	wm_require_refresh();
 	wm_mainloop();
 	return 0;
 }

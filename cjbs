@@ -31,6 +31,7 @@ function main()
 		"-")
 			echo -e "\e[1;32m> running $2\e[m"
 			./$DESTNAME
+			echo -e "\e[1;36m: done\e[m"
 			;;
 		"clean")
 			for d in $SRCDIR; do
@@ -39,12 +40,18 @@ function main()
 			done
 			echo -e "\e[1;32m> cleaning $DESTNAME\e[m"
 			rm -f $DESTNAME
+			echo -e "\e[1;36m: done\e[m"
+			;;
+		"--")
+			main
+			main -
+			main clean
 			;;
 		*)
 			cjbuild $DESTNAME $SRCDIR
+			echo -e "\e[1;36m: done\e[m"
 			;;
 	esac
-	echo -e "\e[1;36m: done\e[m"
 }
 
 function cjbuild()
@@ -60,7 +67,7 @@ function cjbuild()
 	done
 
 	echo -e "\e[1;32m> linking $dest\e[m"
-	echo "gcc -o $dest $objs $LDFLAGS"
+	echo "    gcc -o $dest $objs $LDFLAGS"
 	echo -ne "\e[1;31m"
 	if ! gcc -o $dest $objs $LDFLAGS; then
 		echo -e "\e[1;35m: compilation failed\e[m"

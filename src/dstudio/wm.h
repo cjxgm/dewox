@@ -14,8 +14,9 @@
 extern int wm_win_w;
 extern int wm_win_h;
 
-void wm_init();
-void wm_mainloop();
+inline void wm_init();
+inline void wm_mainloop();
+inline void wm_require_refresh();
 
 #endif
 
