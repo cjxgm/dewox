@@ -11,23 +11,37 @@
 #include "wm.h"
 #include "config.h"
 #include <GL/glut.h>
+#include <stdio.h>
 
 int wm_win_w = 640;
 int wm_win_h = 480;
 
+static int edge = 0;
+static int edge_x = 0;
+static int edge_y = 0;
+static int edge_w = 0;
+static int edge_h = 0;
+
+// events
 static void idle();
 static void resize(int w, int h);
+static void hover(int mx, int my);
+static void click(int btn, int stt, int mx, int my);
+static void drag(int mx, int my);
 
-
+// window management
 #define WINDOW_TYPE_UNUSED		0
 #define WINDOW_TYPE_SPLIT_X		1
 #define WINDOW_TYPE_SPLIT_Y		2
 #define WINDOW_TYPE_TEST		3
+#define EDGE_FLAG_NONE			0
+#define EDGE_FLAG_DRAW			1
 static struct WindowInfo
 {
 	int type;
 	int child[2];
 	float ratio;
+	int edge_flag;
 } windows[WM_MAX_WINDOW_CNT];
 
 static struct WindowEntry
@@ -39,10 +53,15 @@ static struct WindowEntry
 static int alloc_win();
 static void free_win(int win);
 
-
+// some useful functions
 static void render(int win, int x, int y, int w, int h);
 static void view2d(int x, int y, int w, int h);
+static void draw_edge_y(int x, int h);
+static void draw_edge_x(int y, int w);
+static void draw_box_down(int x, int y, int w, int h,
+		float r, float g, float b);
 
+// window: test
 static void test_render(int w, int h);
 
 ////////////////////////////////////////
@@ -64,6 +83,9 @@ inline void wm_init()
 	// bind events
 	glutDisplayFunc(&wm_require_refresh);
 	glutReshapeFunc(&resize);
+	glutPassiveMotionFunc(&hover);
+	glutMotionFunc(&drag);
+	glutMouseFunc(&click);
 
 	// setup blank color
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -79,6 +101,7 @@ inline void wm_init()
 	int i;
 	for (i=0; i<WM_MAX_WINDOW_CNT; i++) {
 		//windows[i].type   = WINDOW_TYPE_UNUSED;
+		//windows[i].edge_flag = EDGE_FLAG_NONE;
 		windows[i].child[0] = i + 1;
 	}
 	windows[WM_MAX_WINDOW_CNT-1].child[0] = 0;
@@ -137,6 +160,102 @@ static void resize(int w, int h)
 	wm_win_h = h;
 }
 
+static void hover(int mx, int my)
+{
+	my = wm_win_h - my;
+	// TODO: mouse event for edges
+	int win = 1;
+	int x = 0;
+	int y = 0;
+	int w = wm_win_w;
+	int h = wm_win_h;
+	int t;
+	while (windows[win].type) {
+		switch (windows[win].type) {
+			case WINDOW_TYPE_SPLIT_X:
+				t = w * windows[win].ratio;
+				if (mx >= x+t-2 && mx <= x+t+2) {
+					if (windows[win].edge_flag != EDGE_FLAG_DRAW) {
+						windows[win].edge_flag = EDGE_FLAG_DRAW;
+						wm_require_refresh();
+						edge = win;
+						edge_x = x;
+						edge_w = w;
+					}
+					win = 0;
+				}
+				else {
+					if (windows[win].edge_flag != EDGE_FLAG_NONE) {
+						windows[win].edge_flag = EDGE_FLAG_NONE;
+						wm_require_refresh();
+						edge = 0;
+					}
+					if (mx < x+t) win = windows[win].child[0];
+					else if (mx > x+t) win = windows[win].child[1];
+					else win = 0;
+				}
+				break;
+			case WINDOW_TYPE_SPLIT_Y:
+				t = h * windows[win].ratio;
+				if (my >= y+t-2 && my <= y+t+2) {
+					if (windows[win].edge_flag != EDGE_FLAG_DRAW) {
+						windows[win].edge_flag = EDGE_FLAG_DRAW;
+						wm_require_refresh();
+						edge = win;
+						edge_y = y;
+						edge_h = h;
+					}
+					win = 0;
+				}
+				else {
+					if (windows[win].edge_flag != EDGE_FLAG_NONE) {
+						windows[win].edge_flag = EDGE_FLAG_NONE;
+						wm_require_refresh();
+						edge = 0;
+					}
+					if (my < y+t) win = windows[win].child[0];
+					else if (my > y+t) win = windows[win].child[1];
+					else win = 0;
+				}
+				break;
+			default:
+				win = 0;
+				break;
+		}
+	}
+	// TODO: mouse event for header
+	// TODO: mouse event for window
+}
+
+static void click(int btn, int stt, int mx, int my)
+{
+	my = wm_win_h - my;
+}
+
+static void drag(int mx, int my)
+{
+	my = wm_win_h - my;
+
+	switch (windows[edge].type) {
+		case WINDOW_TYPE_SPLIT_X:
+			windows[edge].ratio = (mx-edge_x) / (float)edge_w;
+			if (windows[edge].ratio < 0)
+				windows[edge].ratio = 0;
+			else if (windows[edge].ratio > 1)
+				windows[edge].ratio = 1;
+			wm_require_refresh();
+			break;
+		case WINDOW_TYPE_SPLIT_Y:
+			windows[edge].ratio = (my-edge_y) / (float)edge_h;
+			if (windows[edge].ratio < 0)
+				windows[edge].ratio = 0;
+			else if (windows[edge].ratio > 1)
+				windows[edge].ratio = 1;
+			wm_require_refresh();
+			break;
+	}
+}
+
 ////////////////////////////////////////
 //
 // window management
@@ -177,19 +296,64 @@ static void render(int win, int x, int y, int w, int h)
 		case WINDOW_TYPE_UNUSED: break;
 		case WINDOW_TYPE_SPLIT_X:
 			t = w * windows[win].ratio;
-			render(windows[win].child[0], x, y, t-2, h);
-			render(windows[win].child[1], x+t, y, w-t, h);
+			render(windows[win].child[0], x, y, t-1, h);
+			render(windows[win].child[1], x+t+1, y, w-t-1, h);
+			if (windows[win].edge_flag) {
+				view2d(x, y, w, h);
+				draw_edge_y(t, h);
+			}
 			break;
 		case WINDOW_TYPE_SPLIT_Y:
 			t = h * windows[win].ratio;
-			render(windows[win].child[0], x, y, w, t-2);
-			render(windows[win].child[1], x, y+t, w, h-t);
+			render(windows[win].child[0], x, y, w, t-1);
+			render(windows[win].child[1], x, y+t+1, w, h-t-1);
+			if (windows[win].edge_flag) {
+				view2d(x, y, w, h);
+				draw_edge_x(t, w);
+			}
 			break;
 		default:
-			view2d(x, y, w, h);
+			t = (h<30 ? h : 30);
+			view2d(x, y, w, t);
+			// TODO: draw header
+			draw_box_down(0, 0, w, 30, 0.5, 0.5, 0.5);
+			view2d(x, y+t, w, h-t);
 			window_entries[windows[win].type].render(w, h);
 			break;
 	}
+}
+
+static void draw_edge_y(int x, int h)
+{
+	glLineWidth(4);
+	glColor3f(0.2f, 0.2f, 1.0f);
+	glBegin(GL_LINES);
+	glVertex2f(x, 0);
+	glVertex2f(x, h);
+	glEnd();
+}
+
+static void draw_edge_x(int y, int w)
+{
+	glLineWidth(4);
+	glColor3f(0.2f, 0.2f, 1.0f);
+	glBegin(GL_LINES);
+	glVertex2f(0, y);
+	glVertex2f(w, y);
+	glEnd();
+}
+
+static void draw_box_down(int x, int y, int w, int h,
+		float r, float g, float b)
+{
+	glBegin(GL_QUADS);
+	glColor3f(r * 1.1f, g * 1.1f, b * 1.1f);
+	glVertex2f(x, y);
+	glVertex2f(x+w, y);
+	glColor3f(r * 0.9f, g * 0.9f, b * 0.9f);
+	glVertex2f(x+w, y+h);
+	glVertex2f(x, y+h);
+	glEnd();
 }
 
 ////////////////////////////////////////
