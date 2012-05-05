@@ -10,6 +10,7 @@
 
 #include "wm.h"
 #include "config.h"
+#include "ui/ui.h"
 #include <GL/glut.h>
 #include <stdio.h>
 
@@ -21,6 +22,19 @@ static int edge_x = 0;
 static int edge_y = 0;
 static int edge_w = 0;
 static int edge_h = 0;
+
+static int active_win = 0;
+
+static void close_cb();
+static void split_y_cb();
+static void split_x_cb();
+static UIMenu wm_menu[] = {
+	{UI_MENU_FUNC, &close_cb,   "X"},
+	{UI_MENU_FUNC, &split_y_cb, "-"},
+	{UI_MENU_FUNC, &split_x_cb, "|"},
+	{UI_MENU_EDITOR_SELECTOR},
+	{UI_MENU_DONE}
+};
 
 // events
 static void idle();
@@ -60,6 +74,7 @@ static void draw_edge_y(int x, int h);
 static void draw_edge_x(int y, int w);
 static void draw_box_down(int x, int y, int w, int h,
 		float r, float g, float b);
+static void draw_outline(int x, int y, int w, int h);
 
 // window: test
 static void test_render(int w, int h);
@@ -219,6 +234,10 @@ static void hover(int mx, int my)
 				}
 				break;
 			default:
+				if (active_win != win) {
+					active_win = win;
+					wm_require_refresh();
+				}
 				win = 0;
 				break;
 		}
@@ -313,12 +332,17 @@ static void render(int win, int x, int y, int w, int h)
 			}
 			break;
 		default:
-			t = (h<30 ? h : 30);
+			t = (h<25 ? h : 25);
 			view2d(x, y, w, t);
 			// TODO: draw header
-			draw_box_down(0, 0, w, 30, 0.5, 0.5, 0.5);
+			draw_box_down(0, 0, w, 25, 0.2, 0.2, 0.2);
+			ui_menu_draw(wm_menu, 0, 0);
 			view2d(x, y+t, w, h-t);
 			window_entries[windows[win].type].render(w, h);
+			if (win == active_win) {
+				view2d(x, y, w, h);
+				draw_outline(0, 0, w, h);
+			}
 			break;
 	}
 }
@@ -356,6 +380,28 @@ static void draw_box_down(int x, int y, int w, int h,
 	glEnd();
 }
 
+static void draw_outline(int x, int y, int w, int h)
+{
+	glLineWidth(2);
+	glBegin(GL_LINE_LOOP);
+	glColor4f(0.2f, 0.2f, 1.0f, 0.3f);
+	glVertex2f(x-1, y-1);
+	glVertex2f(x+w+1, y-1);
+	glVertex2f(x+w+1, y+h+1);
+	glVertex2f(x-1, y+h+1);
+	glColor4f(0.2f, 0.2f, 1.0f, 0.7f);
+	glVertex2f(x, y);
+	glVertex2f(x+w, y);
+	glVertex2f(x+w, y+h);
+	glVertex2f(x, y+h);
+	glColor4f(0.2f, 0.2f, 1.0f, 1.0f);
+	glVertex2f(x+1, y+1);
+	glVertex2f(x+w-1, y+1);
+	glVertex2f(x+w-1, y+h-1);
+	glVertex2f(x+1, y+h-1);
+	glEnd();
+}
+
 ////////////////////////////////////////
 //
 // view switchers
@@ -370,6 +416,23 @@ static void view2d(int x, int y, int w, int h)
 	glOrtho(0, w, 0, h, -1, 1);
 	glMatrixMode(GL_MODELVIEW);
 	//glLoadIdentity();
+}
+
+////////////////////////////////////////
+//
+// Callbacks
+//
+
+static void close_cb()
+{
+}
+
+static void split_y_cb()
+{
+}
+
+static void split_x_cb()
+{
 }
 
 ////////////////////////////////////////
