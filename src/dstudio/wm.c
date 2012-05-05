@@ -22,6 +22,10 @@ static int edge_x = 0;
 static int edge_y = 0;
 static int edge_w = 0;
 static int edge_h = 0;
+static int win_x = 0;
+static int win_y = 0;
+static int win_w = 0;
+static int win_h = 0;
 
 static int active_win = 0;
 
@@ -56,6 +60,7 @@ static struct WindowInfo
 	int child[2];
 	float ratio;
 	int edge_flag;
+	UIMenuParam menu_param;
 } windows[WM_MAX_WINDOW_CNT];
 
 static struct WindowEntry
@@ -118,6 +123,7 @@ inline void wm_init()
 		//windows[i].type   = WINDOW_TYPE_UNUSED;
 		//windows[i].edge_flag = EDGE_FLAG_NONE;
 		windows[i].child[0] = i + 1;
+		windows[i].menu_param.active = -1;
 	}
 	windows[WM_MAX_WINDOW_CNT-1].child[0] = 0;
 
@@ -178,7 +184,8 @@ static void resize(int w, int h)
 static void hover(int mx, int my)
 {
 	my = wm_win_h - my;
-	// TODO: mouse event for edges
+
+	// mouse event for edges
 	int win = 1;
 	int x = 0;
 	int y = 0;
@@ -197,7 +204,7 @@ static void hover(int mx, int my)
 						edge_x = x;
 						edge_w = w;
 					}
-					win = 0;
+					return;
 				}
 				else {
 					if (windows[win].edge_flag != EDGE_FLAG_NONE) {
@@ -205,8 +212,15 @@ static void hover(int mx, int my)
 						wm_require_refresh();
 						edge = 0;
 					}
-					if (mx < x+t) win = windows[win].child[0];
-					else if (mx > x+t) win = windows[win].child[1];
+					if (mx < x+t) {
+						w = t;
+						win = windows[win].child[0];
+					}
+					else if (mx > x+t) {
+						x += t;
+						w -= t;
+						win = windows[win].child[1];
+					}
 					else win = 0;
 				}
 				break;
@@ -220,7 +234,7 @@ static void hover(int mx, int my)
 						edge_y = y;
 						edge_h = h;
 					}
-					win = 0;
+					return;
 				}
 				else {
 					if (windows[win].edge_flag != EDGE_FLAG_NONE) {
@@ -228,21 +242,39 @@ static void hover(int mx, int my)
 						wm_require_refresh();
 						edge = 0;
 					}
-					if (my < y+t) win = windows[win].child[0];
-					else if (my > y+t) win = windows[win].child[1];
+					if (my < y+t) {
+						h = t;
+						win = windows[win].child[0];
+					}
+					else if (my > y+t) {
+						y += t;
+						h -= t;
+						win = windows[win].child[1];
+					}
 					else win = 0;
 				}
 				break;
 			default:
 				if (active_win != win) {
 					active_win = win;
+					win_x = x;
+					win_y = y;
+					win_w = w;
+					win_h = h;
 					wm_require_refresh();
 				}
 				win = 0;
 				break;
 		}
 	}
+
 	// TODO: mouse event for header
+	if (my-win_y < 25) {
+		ui_menu_hover(wm_menu, &windows[active_win].menu_param,
+				0, 0, mx-win_x, my-win_y);
+		return;
+	}
+
 	// TODO: mouse event for window
 }
 
@@ -336,7 +368,7 @@ static void render(int win, int x, int y, int w, int h)
 			view2d(x, y, w, t);
 			// TODO: draw header
 			draw_box_down(0, 0, w, 25, 0.2, 0.2, 0.2);
-			ui_menu_draw(wm_menu, 0, 0);
+			ui_menu_draw(wm_menu, &windows[win].menu_param, 0, 0);
 			view2d(x, y+t, w, h-t);
 			window_entries[windows[win].type].render(w, h);
 			if (win == active_win) {

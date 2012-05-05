@@ -23,8 +23,16 @@ typedef struct UIMenu
 }
 UIMenu;
 
+typedef struct UIMenuParam
+{
+	int active;
+}
+UIMenuParam;
 
-void ui_menu_draw(UIMenu menu[], int x, int y);
+
+void ui_menu_draw(UIMenu menu[], UIMenuParam * param, int x, int y);
+void ui_menu_hover(UIMenu menu[], UIMenuParam * param,
+		int x, int y, int mx, int my);
 
 #endif
 
