@@ -76,3 +76,12 @@ void ui_menu_hover(UIMenu menu[], UIMenuParam * param,
 	}
 }
 
+void ui_menu_click(UIMenu menu[], UIMenuParam * param,
+		int x, int y, int mx, int my)
+{
+	if (param->active == -1) return;
+	UIMenu * m = &menu[param->active];
+	if (m->data)
+		((void (*)())m->data)();
+}
+

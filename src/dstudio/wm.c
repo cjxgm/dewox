@@ -17,6 +17,10 @@
 int wm_win_w = 640;
 int wm_win_h = 480;
 
+#define MODE_EDGE_SELECTED		1
+#define MODE_WIN_CLOSING		2
+#define MODE_WIN_SPLIT_Y		3
+static int mode = 0;
 static int edge = 0;
 static int edge_x = 0;
 static int edge_y = 0;
@@ -71,6 +75,8 @@ static struct WindowEntry
 
 static int alloc_win();
 static void free_win(int win);
+static void close_win();
+static void split_win(int type, float ratio);
 
 // some useful functions
 static void render(int win, int x, int y, int w, int h);
@@ -161,6 +167,14 @@ inline void wm_require_refresh()
 	glutIdleFunc(&idle);
 }
 
+void wm_register_window(const char * name, WindowRenderFunc * render)
+{
+	int i = 0;
+	while (window_entries[i].name) i++;
+	window_entries[i].name   = name;
+	window_entries[i].render = render;
+}
+
 ////////////////////////////////////////
 //
 // events
@@ -183,7 +197,15 @@ static void resize(int w, int h)
 
 static void hover(int mx, int my)
 {
+	if (mode == MODE_WIN_CLOSING) return;
+
 	my = wm_win_h - my;
+
+	if (mode == MODE_WIN_SPLIT_Y) {
+		edge_y = my - win_y;
+		wm_require_refresh();
+		return;
+	}
 
 	// mouse event for edges
 	int win = 1;
@@ -195,12 +217,13 @@ static void hover(int mx, int my)
 	while (windows[win].type) {
 		switch (windows[win].type) {
 			case WINDOW_TYPE_SPLIT_X:
+				edge = win;
 				t = w * windows[win].ratio;
 				if (mx >= x+t-2 && mx <= x+t+2) {
 					if (windows[win].edge_flag != EDGE_FLAG_DRAW) {
 						windows[win].edge_flag = EDGE_FLAG_DRAW;
 						wm_require_refresh();
-						edge = win;
+						mode = MODE_EDGE_SELECTED;
 						edge_x = x;
 						edge_w = w;
 					}
@@ -210,7 +233,7 @@ static void hover(int mx, int my)
 					if (windows[win].edge_flag != EDGE_FLAG_NONE) {
 						windows[win].edge_flag = EDGE_FLAG_NONE;
 						wm_require_refresh();
-						edge = 0;
+						mode = 0;
 					}
 					if (mx < x+t) {
 						w = t;
@@ -225,12 +248,13 @@ static void hover(int mx, int my)
 				}
 				break;
 			case WINDOW_TYPE_SPLIT_Y:
+				edge = win;
 				t = h * windows[win].ratio;
 				if (my >= y+t-2 && my <= y+t+2) {
 					if (windows[win].edge_flag != EDGE_FLAG_DRAW) {
 						windows[win].edge_flag = EDGE_FLAG_DRAW;
 						wm_require_refresh();
-						edge = win;
+						mode = MODE_EDGE_SELECTED;
 						edge_y = y;
 						edge_h = h;
 					}
@@ -240,7 +264,7 @@ static void hover(int mx, int my)
 					if (windows[win].edge_flag != EDGE_FLAG_NONE) {
 						windows[win].edge_flag = EDGE_FLAG_NONE;
 						wm_require_refresh();
-						edge = 0;
+						mode = 0;
 					}
 					if (my < y+t) {
 						h = t;
@@ -280,30 +304,47 @@ static void hover(int mx, int my)
 
 static void click(int btn, int stt, int mx, int my)
 {
+	if (mode == MODE_WIN_CLOSING) return;
+
 	my = wm_win_h - my;
+
+	if (mode == MODE_WIN_SPLIT_Y) {
+		if (btn == GLUT_LEFT_BUTTON && stt == GLUT_DOWN) {
+			split_win(WINDOW_TYPE_SPLIT_Y, edge_y / (float)win_h);
+			mode = 0;
+			wm_require_refresh();
+		}
+	}
+	if (active_win && btn == GLUT_LEFT_BUTTON && stt == GLUT_DOWN)
+		ui_menu_click(wm_menu, &windows[active_win].menu_param,
+				0, 0, mx, my);
 }
 
 static void drag(int mx, int my)
 {
+	if (mode == MODE_WIN_CLOSING) return;
+
 	my = wm_win_h - my;
 
-	switch (windows[edge].type) {
-		case WINDOW_TYPE_SPLIT_X:
-			windows[edge].ratio = (mx-edge_x) / (float)edge_w;
-			if (windows[edge].ratio < 0)
-				windows[edge].ratio = 0;
-			else if (windows[edge].ratio > 1)
-				windows[edge].ratio = 1;
-			wm_require_refresh();
-			break;
-		case WINDOW_TYPE_SPLIT_Y:
-			windows[edge].ratio = (my-edge_y) / (float)edge_h;
-			if (windows[edge].ratio < 0)
-				windows[edge].ratio = 0;
-			else if (windows[edge].ratio > 1)
-				windows[edge].ratio = 1;
-			wm_require_refresh();
-			break;
+	if (mode == MODE_EDGE_SELECTED) {
+		switch (windows[edge].type) {
+			case WINDOW_TYPE_SPLIT_X:
+				windows[edge].ratio = (mx-edge_x) / (float)edge_w;
+				if (windows[edge].ratio < 0)
+					windows[edge].ratio = 0;
+				else if (windows[edge].ratio > 1)
+					windows[edge].ratio = 1;
+				wm_require_refresh();
+				break;
+			case WINDOW_TYPE_SPLIT_Y:
+				windows[edge].ratio = (my-edge_y) / (float)edge_h;
+				if (windows[edge].ratio < 0)
+					windows[edge].ratio = 0;
+				else if (windows[edge].ratio > 1)
+					windows[edge].ratio = 1;
+				wm_require_refresh();
+				break;
+		}
 	}
 }
 
@@ -327,12 +368,33 @@ static void free_win(int win)
 	windows[  0].child[0] = win;
 }
 
-void wm_register_window(const char * name, WindowRenderFunc * render)
+// close the active win
+static void close_win()
 {
-	int i = 0;
-	while (window_entries[i].name) i++;
-	window_entries[i].name   = name;
-	window_entries[i].render = render;
+	if (windows[1].type != WINDOW_TYPE_SPLIT_X &&
+			windows[1].type != WINDOW_TYPE_SPLIT_Y)
+		return;
+
+	int t = (active_win == windows[edge].child[0]);
+
+	free_win(active_win);
+	active_win = windows[edge].child[t];
+	windows[edge] = windows[active_win];
+	free_win(active_win);
+}
+
+static void split_win(int type, float ratio)
+{
+	int win[2] = {alloc_win(), alloc_win()};
+	windows[win[0]].type = windows[win[1]].type = windows[active_win].type;
+	windows[win[0]].menu_param.active =
+			windows[win[1]].menu_param.active = -1;
+	windows[active_win].type  = type;
+	windows[active_win].ratio = ratio;
+	windows[active_win].child[0] = win[0];
+	windows[active_win].child[1] = win[1];
+	active_win = 0;
+	edge = 0;
 }
 
 ////////////////////////////////////////
@@ -349,7 +411,7 @@ static void render(int win, int x, int y, int w, int h)
 			t = w * windows[win].ratio;
 			render(windows[win].child[0], x, y, t-1, h);
 			render(windows[win].child[1], x+t+1, y, w-t-1, h);
-			if (windows[win].edge_flag) {
+			if (mode == MODE_EDGE_SELECTED && win == edge) {
 				view2d(x, y, w, h);
 				draw_edge_y(t, h);
 			}
@@ -358,7 +420,7 @@ static void render(int win, int x, int y, int w, int h)
 			t = h * windows[win].ratio;
 			render(windows[win].child[0], x, y, w, t-1);
 			render(windows[win].child[1], x, y+t+1, w, h-t-1);
-			if (windows[win].edge_flag) {
+			if (mode == MODE_EDGE_SELECTED && win == edge) {
 				view2d(x, y, w, h);
 				draw_edge_x(t, w);
 			}
@@ -374,8 +436,30 @@ static void render(int win, int x, int y, int w, int h)
 			if (win == active_win) {
 				view2d(x, y, w, h);
 				draw_outline(0, 0, w, h);
+				// splitting
+				if (mode == MODE_WIN_SPLIT_Y) {
+					view2d(x, y, w, h);
+					draw_edge_x(edge_y, w);
+				}
 			}
 			break;
+	}
+
+	// window closing animation
+	if (mode == MODE_WIN_CLOSING) {
+		if (active_win == windows[edge].child[0]) {
+			if ((windows[edge].ratio -= 0.01) < 0) {
+				mode = 0;
+				close_win();
+			}
+		}
+		else {
+			if ((windows[edge].ratio += 0.01) > 1) {
+				mode = 0;
+				close_win();
+			}
+		}
+		wm_require_refresh();
 	}
 }
 
@@ -457,10 +541,13 @@ static void view2d(int x, int y, int w, int h)
 
 static void close_cb()
 {
+	mode = MODE_WIN_CLOSING;
+	wm_require_refresh();
 }
 
 static void split_y_cb()
 {
+	mode = MODE_WIN_SPLIT_Y;
 }
 
 static void split_x_cb()

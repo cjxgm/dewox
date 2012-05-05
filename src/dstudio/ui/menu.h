@@ -18,7 +18,7 @@
 typedef struct UIMenu
 {
 	int type;
-	void * param;
+	void * data;
 	const char * label;
 }
 UIMenu;
@@ -32,6 +32,8 @@ UIMenuParam;
 
 void ui_menu_draw(UIMenu menu[], UIMenuParam * param, int x, int y);
 void ui_menu_hover(UIMenu menu[], UIMenuParam * param,
+		int x, int y, int mx, int my);
+void ui_menu_click(UIMenu menu[], UIMenuParam * param,
 		int x, int y, int mx, int my);
 
 #endif
