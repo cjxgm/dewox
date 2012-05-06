@@ -1,5 +1,5 @@
 	void editor_welcome_init();
 	editor_welcome_init();
 
-	void editor_test_init();
-	editor_test_init();
+	void editor_color_init();
+	editor_color_init();

@@ -17,15 +17,29 @@ cat > $1.c << EOF
 #include <GL/gl.h>
 
 static void render(int w, int h);
+static void hover(int x, int y, int w, int h);
+static void click(int x, int y, int w, int h);
+static void drag(int x, int y, int w, int h);
 
 void editor_$1_init()
 {
-	wm_register_editor("$1", render);
+	wm_register_editor("$1", render, hover, click, drag);
 }
 
 static void render(int w, int h)
 {
-	// drawing code here
+}
+
+static void hover(int x, int y, int w, int h)
+{
+}
+
+static void click(int x, int y, int w, int h)
+{
+}
+
+static void drag(int x, int y, int w, int h)
+{
 }
 
 EOF

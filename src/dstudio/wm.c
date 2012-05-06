@@ -127,9 +127,9 @@ inline void wm_init()
 	windows[WM_MAX_WINDOW_CNT-1].child[0] = 0;
 
 	// register internal editors
-	wm_register_editor("unused", NULL);
-	wm_register_editor("split-x", NULL);
-	wm_register_editor("split-y", NULL);
+	wm_register_editor("unused", NULL, NULL, NULL, NULL);
+	wm_register_editor("split-x", NULL, NULL, NULL, NULL);
+	wm_register_editor("split-y", NULL, NULL, NULL, NULL);
 	// register external editors
 	editor_init();
 
@@ -158,10 +158,15 @@ inline EditorInfo * wm_get_editor(int id)
 	return &editors[id];
 }
 
-void wm_register_editor(const char * name, EditorRenderFunc * render)
+void wm_register_editor(const char * name,
+		EditorRenderFunc * render, EditorHoverFunc * hover,
+		EditorClickFunc * click, EditorDragFunc * drag)
 {
 	editors[wm_editor_cnt].name   = name;
 	editors[wm_editor_cnt].render = render;
+	editors[wm_editor_cnt].hover  = hover;
+	editors[wm_editor_cnt].click  = click;
+	editors[wm_editor_cnt].drag   = drag;
 	wm_editor_cnt++;
 }
 
@@ -289,7 +294,7 @@ static void hover(int mx, int my)
 		}
 	}
 
-	// TODO: mouse event for header
+	// mouse event for header
 	if (my-win_y < 25) {
 		wm_menu[3].data = &windows[active_win].type;
 		ui_menu_hover(wm_menu, &windows[active_win].menu_param,
@@ -297,7 +302,10 @@ static void hover(int mx, int my)
 		return;
 	}
 
-	// TODO: mouse event for window
+	// mouse event for window
+	if (active_win)
+		editors[windows[active_win].type].hover(mx-win_x, my-win_y-25,
+				win_w, win_h-25);
 }
 
 static void click(int btn, int stt, int mx, int my)
@@ -328,7 +336,11 @@ static void click(int btn, int stt, int mx, int my)
 		wm_menu[3].data = &windows[active_win].type;
 		ui_menu_click(wm_menu, &windows[active_win].menu_param,
 				0, 0, mx, my);
+
+		editors[windows[active_win].type].click(mx-win_x, my-win_y-25,
+				win_w, win_h-25);
 	}
+
 }
 
 static void drag(int mx, int my)
@@ -360,7 +372,12 @@ static void drag(int mx, int my)
 				break;
 		}
 		active_win = 0;
+		return;
 	}
+
+	if (active_win)
+		editors[windows[active_win].type].drag(mx-win_x, my-win_y-25,
+				win_w, win_h-25);
 }
 
 ////////////////////////////////////////

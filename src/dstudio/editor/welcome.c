@@ -13,10 +13,13 @@
 #include <GL/gl.h>
 
 static void render(int w, int h);
+static void hover(int x, int y, int w, int h);
+static void click(int x, int y, int w, int h);
+static void drag(int x, int y, int w, int h);
 
 void editor_welcome_init()
 {
-	wm_register_editor("Welcome", render);
+	wm_register_editor("Welcome", render, hover, click, drag);
 }
 
 static void render(int w, int h)
@@ -57,5 +60,17 @@ static void render(int w, int h)
 	glVertex2f(136, 80);
 	glEnd();
 	font_render("Window Killer", 140, 70);
+}
+
+static void hover(int x, int y, int w, int h)
+{
+}
+
+static void click(int x, int y, int w, int h)
+{
+}
+
+static void drag(int x, int y, int w, int h)
+{
 }
 

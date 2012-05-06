@@ -12,10 +12,16 @@
 #define __WM_H
 
 typedef void (EditorRenderFunc)(int w, int h);
+typedef void (EditorHoverFunc)(int x, int y, int w, int h);
+typedef void (EditorClickFunc)(int x, int y, int w, int h);
+typedef void (EditorDragFunc)(int x, int y, int w, int h);
 typedef struct EditorInfo
 {
 	const char * name;
 	EditorRenderFunc * render;
+	EditorHoverFunc  * hover;
+	EditorClickFunc  * click;
+	EditorDragFunc   * drag;
 }
 EditorInfo;
 
@@ -33,7 +39,9 @@ inline void wm_require_refresh();
 inline int  wm_ticks();
 
 inline EditorInfo * wm_get_editor(int id);
-void wm_register_editor(const char * name, EditorRenderFunc * render);
+void wm_register_editor(const char * name,
+		EditorRenderFunc * render, EditorHoverFunc * hover,
+		EditorClickFunc * click, EditorDragFunc * drag);
 
 #endif
 
