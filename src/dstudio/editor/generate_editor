@@ -1,0 +1,38 @@
+#!/bin/bash
+
+[ -z "$1" ] && exit 1
+
+cat > $1.c << EOF
+
+/************************************************************
+ * dewox: $1
+ *
+ * Licensed under GPLv2.
+ * ABSOLUTELY NO WARRANTY!
+ *
+ * Copyright (C) eXerigumo Clanjor (哆啦比猫/兰威举).
+ ************************************************************/
+
+#include "../wm.h"
+#include <GL/gl.h>
+
+static void render(int w, int h);
+
+void editor_$1_init()
+{
+	wm_register_editor("$1", render);
+}
+
+static void render(int w, int h)
+{
+	// drawing code here
+}
+
+EOF
+
+cat >> editors << EOF
+
+	void editor_$1_init();
+	editor_$1_init();
+EOF
+

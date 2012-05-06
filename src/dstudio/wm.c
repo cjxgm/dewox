@@ -12,6 +12,7 @@
 #include "config.h"
 #include "../dshared/dshared.h"
 #include "ui/ui.h"
+#include "editor/editor.h"
 #include <GL/glut.h>
 #include <stdio.h>
 
@@ -59,7 +60,6 @@ static void drag(int mx, int my);
 #define WINDOW_TYPE_UNUSED		0
 #define WINDOW_TYPE_SPLIT_X		1
 #define WINDOW_TYPE_SPLIT_Y		2
-#define WINDOW_TYPE_TEST		3
 #define EDGE_FLAG_NONE			0
 #define EDGE_FLAG_DRAW			1
 static struct WindowInfo
@@ -82,9 +82,6 @@ static void split_win(int type, float ratio);
 // some useful functions
 static void render(int win, int x, int y, int w, int h);
 static void view2d(int x, int y, int w, int h);
-
-// editor: test
-static void test_render(int w, int h);
 
 ////////////////////////////////////////
 //
@@ -129,30 +126,16 @@ inline void wm_init()
 	}
 	windows[WM_MAX_WINDOW_CNT-1].child[0] = 0;
 
-	// register internal windows
+	// register internal editors
 	wm_register_editor("unused", NULL);
 	wm_register_editor("split-x", NULL);
 	wm_register_editor("split-y", NULL);
+	// register external editors
+	editor_init();
 
-	// test
-	wm_register_editor("test", test_render);
-	wm_register_editor("testxxx", test_render);
-	wm_register_editor("xxx", test_render);
-
+	// create a window
 	int win = alloc_win();
-	windows[win].type = WINDOW_TYPE_SPLIT_X;
-	windows[win].child[0] = alloc_win();
-	windows[win].child[1] = alloc_win();
-	windows[win].ratio    = 0.7f;
-	windows[windows[win].child[0]].type = WINDOW_TYPE_TEST;
-
-	win = windows[win].child[1];
-	windows[win].type = WINDOW_TYPE_SPLIT_Y;
-	windows[win].child[0] = alloc_win();
-	windows[win].child[1] = alloc_win();
-	windows[win].ratio    = 0.7f;
-	windows[windows[win].child[0]].type = WINDOW_TYPE_TEST;
-	windows[windows[win].child[1]].type = WINDOW_TYPE_TEST;
+	windows[win].type = 3;	// the first external editor
 }
 
 inline void wm_mainloop()
@@ -308,6 +291,7 @@ static void hover(int mx, int my)
 
 	// TODO: mouse event for header
 	if (my-win_y < 25) {
+		wm_menu[3].data = &windows[active_win].type;
 		ui_menu_hover(wm_menu, &windows[active_win].menu_param,
 				0, 0, mx-win_x, my-win_y);
 		return;
@@ -375,6 +359,7 @@ static void drag(int mx, int my)
 				wm_require_refresh();
 				break;
 		}
+		active_win = 0;
 	}
 }
 
@@ -464,7 +449,7 @@ static void render(int win, int x, int y, int w, int h)
 			wm_menu[3].data = &windows[win].type;
 			ui_menu_draw(wm_menu, &windows[win].menu_param, 0, 0);
 			view2d(x, y+t, w, h-t);
-			editors[windows[win].type].render(w, h);
+			editors[windows[win].type].render(w, h-t);
 			if (win == active_win) {
 				view2d(x, y, w, h);
 				draw_outline(0, 0, w, h);
@@ -531,23 +516,5 @@ static void split_y_cb()
 static void split_x_cb()
 {
 	mode = MODE_WIN_SPLIT_X;
-}
-
-////////////////////////////////////////
-//
-// test
-//
-
-static void test_render(int w, int h)
-{
-	glBegin(GL_POINTS);
-	int x,y;
-	for (y=0; y<h; y++)
-		for (x=0; x<w; x++) {
-			glColor3f(x/(float)w, y/(float)h,
-						x*y/(float)w/(float)h);
-			glVertex2f(x, y);
-		}
-	glEnd();
 }
 
