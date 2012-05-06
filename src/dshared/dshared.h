@@ -15,6 +15,7 @@
 
 #include "misc/link.h"
 #include "font/font.h"
+#include "math/irp.h"
 
 #endif
 

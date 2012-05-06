@@ -9,6 +9,7 @@
  ************************************************************/
 
 #include "menu.h"
+#include "ui.h"
 #include "../wm.h"
 #include "../../dshared/dshared.h"
 #include <GL/gl.h>
@@ -16,6 +17,7 @@
 void ui_menu_draw(UIMenu menu[], UIMenuParam * param, int x, int y)
 {
 	int i, w;
+	const char * s;
 	for (i=0; menu[i].type; i++) {
 		switch (menu[i].type) {
 			case UI_MENU_FUNC:
@@ -28,11 +30,19 @@ void ui_menu_draw(UIMenu menu[], UIMenuParam * param, int x, int y)
 					glVertex2f(x+w+12, y+25-3);
 					glVertex2f(x+2, y+25-3);
 					glEnd();
-					glColor3f(0.0f, 0.0f, 0.0f);
 				}
-				else glColor3f(0.8f, 0.8f, 0.8f);
+				glColor3f(0.8f, 0.8f, 0.8f);
 				glPointSize(1.0f);
 				font_render(menu[i].label, x+6, y+3);
+				x += w + 12;
+				break;
+			case UI_MENU_EDITOR_SELECTOR:
+				s = wm_get_editor(*(int*)menu[i].data)->name;
+				w = font_width(s);
+				draw_button(x+2, y+3, w+12, 25-6, (i == param->active));
+				glColor3f(1.0f, 1.0f, 1.0f);
+				glPointSize(1.0f);
+				font_render(s, x+6, y+3);
 				x += w + 12;
 				break;
 			default:
@@ -66,6 +76,17 @@ void ui_menu_hover(UIMenu menu[], UIMenuParam * param,
 				}
 				x += w + 12;
 				break;
+			case UI_MENU_EDITOR_SELECTOR:
+				w = font_width(wm_get_editor(*(int *)menu[i].data)->name);
+				if (mx > x+2 && mx < x+w+12) {
+					if (param->active != i) {
+						param->active = i;
+						wm_require_refresh();
+					}
+					return;
+				}
+				x += w + 12;
+				break;
 			default:
 				break;
 		}
@@ -81,7 +102,17 @@ void ui_menu_click(UIMenu menu[], UIMenuParam * param,
 {
 	if (param->active == -1) return;
 	UIMenu * m = &menu[param->active];
-	if (m->data)
-		((void (*)())m->data)();
+	switch (m->type) {
+		case UI_MENU_FUNC:
+			if (m->data) ((void (*)())m->data)();
+			break;
+		case UI_MENU_EDITOR_SELECTOR:
+			*(int *)m->data = (*(int *)m->data-3 + 1) %
+					(wm_editor_cnt-3) + 3;
+			wm_require_refresh();
+			break;
+		default:
+			break;
+	}
 }
 

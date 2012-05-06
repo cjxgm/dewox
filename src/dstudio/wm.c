@@ -10,6 +10,7 @@
 
 #include "wm.h"
 #include "config.h"
+#include "../dshared/dshared.h"
 #include "ui/ui.h"
 #include <GL/glut.h>
 #include <stdio.h>
@@ -20,18 +21,21 @@ int wm_win_h = 480;
 #define MODE_EDGE_SELECTED		1
 #define MODE_WIN_CLOSING		2
 #define MODE_WIN_SPLIT_Y		3
+#define MODE_WIN_SPLIT_X		4
 static int mode = 0;
 static int edge = 0;
 static int edge_x = 0;
 static int edge_y = 0;
 static int edge_w = 0;
 static int edge_h = 0;
+static int active_win = 0;
 static int win_x = 0;
 static int win_y = 0;
 static int win_w = 0;
 static int win_h = 0;
+static float win_close_ratio = 0;
+static int win_close_ticks = 0;
 
-static int active_win = 0;
 
 static void close_cb();
 static void split_y_cb();
@@ -67,11 +71,8 @@ static struct WindowInfo
 	UIMenuParam menu_param;
 } windows[WM_MAX_WINDOW_CNT];
 
-static struct WindowEntry
-{
-	const char * name;
-	WindowRenderFunc * render;
-} window_entries[WM_MAX_WINDOW_ENTRY_CNT];
+static EditorInfo editors[WM_MAX_EDITOR_CNT];
+int wm_editor_cnt = 0;
 
 static int alloc_win();
 static void free_win(int win);
@@ -81,13 +82,8 @@ static void split_win(int type, float ratio);
 // some useful functions
 static void render(int win, int x, int y, int w, int h);
 static void view2d(int x, int y, int w, int h);
-static void draw_edge_y(int x, int h);
-static void draw_edge_x(int y, int w);
-static void draw_box_down(int x, int y, int w, int h,
-		float r, float g, float b);
-static void draw_outline(int x, int y, int w, int h);
 
-// window: test
+// editor: test
 static void test_render(int w, int h);
 
 ////////////////////////////////////////
@@ -125,7 +121,7 @@ inline void wm_init()
 
 	// init windows
 	int i;
-	for (i=0; i<WM_MAX_WINDOW_CNT; i++) {
+	for (i=0; i<WM_MAX_EDITOR_CNT; i++) {
 		//windows[i].type   = WINDOW_TYPE_UNUSED;
 		//windows[i].edge_flag = EDGE_FLAG_NONE;
 		windows[i].child[0] = i + 1;
@@ -134,12 +130,14 @@ inline void wm_init()
 	windows[WM_MAX_WINDOW_CNT-1].child[0] = 0;
 
 	// register internal windows
-	wm_register_window("unused", NULL);
-	wm_register_window("split-x", NULL);
-	wm_register_window("split-y", NULL);
+	wm_register_editor("unused", NULL);
+	wm_register_editor("split-x", NULL);
+	wm_register_editor("split-y", NULL);
 
 	// test
-	wm_register_window("test", test_render);
+	wm_register_editor("test", test_render);
+	wm_register_editor("testxxx", test_render);
+	wm_register_editor("xxx", test_render);
 
 	int win = alloc_win();
 	windows[win].type = WINDOW_TYPE_SPLIT_X;
@@ -167,12 +165,21 @@ inline void wm_require_refresh()
 	glutIdleFunc(&idle);
 }
 
-void wm_register_window(const char * name, WindowRenderFunc * render)
+inline int wm_ticks()
 {
-	int i = 0;
-	while (window_entries[i].name) i++;
-	window_entries[i].name   = name;
-	window_entries[i].render = render;
+	return glutGet(GLUT_ELAPSED_TIME);
+}
+
+inline EditorInfo * wm_get_editor(int id)
+{
+	return &editors[id];
+}
+
+void wm_register_editor(const char * name, EditorRenderFunc * render)
+{
+	editors[wm_editor_cnt].name   = name;
+	editors[wm_editor_cnt].render = render;
+	wm_editor_cnt++;
 }
 
 ////////////////////////////////////////
@@ -203,6 +210,11 @@ static void hover(int mx, int my)
 
 	if (mode == MODE_WIN_SPLIT_Y) {
 		edge_y = my - win_y;
+		wm_require_refresh();
+		return;
+	}
+	if (mode == MODE_WIN_SPLIT_X) {
+		edge_x = mx - win_x;
 		wm_require_refresh();
 		return;
 	}
@@ -280,6 +292,8 @@ static void hover(int mx, int my)
 				break;
 			default:
 				if (active_win != win) {
+					if (active_win)
+						windows[active_win].menu_param.active = -1;
 					active_win = win;
 					win_x = x;
 					win_y = y;
@@ -314,15 +328,31 @@ static void click(int btn, int stt, int mx, int my)
 			mode = 0;
 			wm_require_refresh();
 		}
+		return;
 	}
-	if (active_win && btn == GLUT_LEFT_BUTTON && stt == GLUT_DOWN)
+	if (mode == MODE_WIN_SPLIT_X) {
+		if (btn == GLUT_LEFT_BUTTON && stt == GLUT_DOWN) {
+			split_win(WINDOW_TYPE_SPLIT_X, edge_x / (float)win_w);
+			mode = 0;
+			wm_require_refresh();
+		}
+		return;
+	}
+
+	if (active_win && btn == GLUT_LEFT_BUTTON && stt == GLUT_DOWN) {
+		// wm_menu[3] is the editor selector
+		wm_menu[3].data = &windows[active_win].type;
 		ui_menu_click(wm_menu, &windows[active_win].menu_param,
 				0, 0, mx, my);
+	}
 }
 
 static void drag(int mx, int my)
 {
-	if (mode == MODE_WIN_CLOSING) return;
+	if (mode == MODE_WIN_CLOSING ||
+			mode == MODE_WIN_SPLIT_Y ||
+			mode == MODE_WIN_SPLIT_X)
+		return;
 
 	my = wm_win_h - my;
 
@@ -330,18 +360,18 @@ static void drag(int mx, int my)
 		switch (windows[edge].type) {
 			case WINDOW_TYPE_SPLIT_X:
 				windows[edge].ratio = (mx-edge_x) / (float)edge_w;
-				if (windows[edge].ratio < 0)
-					windows[edge].ratio = 0;
-				else if (windows[edge].ratio > 1)
-					windows[edge].ratio = 1;
+				if (windows[edge].ratio < 0.01f)
+					windows[edge].ratio = 0.01f;
+				else if (windows[edge].ratio > 0.99f)
+					windows[edge].ratio = 0.99f;
 				wm_require_refresh();
 				break;
 			case WINDOW_TYPE_SPLIT_Y:
 				windows[edge].ratio = (my-edge_y) / (float)edge_h;
-				if (windows[edge].ratio < 0)
-					windows[edge].ratio = 0;
-				else if (windows[edge].ratio > 1)
-					windows[edge].ratio = 1;
+				if (windows[edge].ratio < 0.01f)
+					windows[edge].ratio = 0.01f;
+				else if (windows[edge].ratio > 0.99f)
+					windows[edge].ratio = 0.99f;
 				wm_require_refresh();
 				break;
 		}
@@ -371,10 +401,6 @@ static void free_win(int win)
 // close the active win
 static void close_win()
 {
-	if (windows[1].type != WINDOW_TYPE_SPLIT_X &&
-			windows[1].type != WINDOW_TYPE_SPLIT_Y)
-		return;
-
 	int t = (active_win == windows[edge].child[0]);
 
 	free_win(active_win);
@@ -385,6 +411,9 @@ static void close_win()
 
 static void split_win(int type, float ratio)
 {
+	if (ratio < 0.01f) ratio = 0.01f;
+	else if (ratio > 0.99f) ratio = 0.99f;
+
 	int win[2] = {alloc_win(), alloc_win()};
 	windows[win[0]].type = windows[win[1]].type = windows[active_win].type;
 	windows[win[0]].menu_param.active =
@@ -393,6 +422,7 @@ static void split_win(int type, float ratio)
 	windows[active_win].ratio = ratio;
 	windows[active_win].child[0] = win[0];
 	windows[active_win].child[1] = win[1];
+
 	active_win = 0;
 	edge = 0;
 }
@@ -430,92 +460,34 @@ static void render(int win, int x, int y, int w, int h)
 			view2d(x, y, w, t);
 			// TODO: draw header
 			draw_box_down(0, 0, w, 25, 0.2, 0.2, 0.2);
+			// wm_menu[3] is the editor selector
+			wm_menu[3].data = &windows[win].type;
 			ui_menu_draw(wm_menu, &windows[win].menu_param, 0, 0);
 			view2d(x, y+t, w, h-t);
-			window_entries[windows[win].type].render(w, h);
+			editors[windows[win].type].render(w, h);
 			if (win == active_win) {
 				view2d(x, y, w, h);
 				draw_outline(0, 0, w, h);
 				// splitting
-				if (mode == MODE_WIN_SPLIT_Y) {
-					view2d(x, y, w, h);
+				if (mode == MODE_WIN_SPLIT_Y)
 					draw_edge_x(edge_y, w);
-				}
+				else if (mode == MODE_WIN_SPLIT_X)
+					draw_edge_y(edge_x, h);
 			}
 			break;
 	}
 
 	// window closing animation
 	if (mode == MODE_WIN_CLOSING) {
-		if (active_win == windows[edge].child[0]) {
-			if ((windows[edge].ratio -= 0.01) < 0) {
-				mode = 0;
-				close_win();
-			}
-		}
-		else {
-			if ((windows[edge].ratio += 0.01) > 1) {
-				mode = 0;
-				close_win();
-			}
+		windows[edge].ratio = firp_out(wm_ticks()-win_close_ticks,
+				0, 300, win_close_ratio,
+				(active_win == windows[edge].child[1]));
+		if (wm_ticks()-win_close_ticks > 300) {
+			mode = 0;
+			close_win();
 		}
 		wm_require_refresh();
 	}
-}
-
-static void draw_edge_y(int x, int h)
-{
-	glLineWidth(4);
-	glColor3f(0.2f, 0.2f, 1.0f);
-	glBegin(GL_LINES);
-	glVertex2f(x, 0);
-	glVertex2f(x, h);
-	glEnd();
-}
-
-static void draw_edge_x(int y, int w)
-{
-	glLineWidth(4);
-	glColor3f(0.2f, 0.2f, 1.0f);
-	glBegin(GL_LINES);
-	glVertex2f(0, y);
-	glVertex2f(w, y);
-	glEnd();
-}
-
-static void draw_box_down(int x, int y, int w, int h,
-		float r, float g, float b)
-{
-	glBegin(GL_QUADS);
-	glColor3f(r * 1.1f, g * 1.1f, b * 1.1f);
-	glVertex2f(x, y);
-	glVertex2f(x+w, y);
-	glColor3f(r * 0.9f, g * 0.9f, b * 0.9f);
-	glVertex2f(x+w, y+h);
-	glVertex2f(x, y+h);
-	glEnd();
-}
-
-static void draw_outline(int x, int y, int w, int h)
-{
-	glLineWidth(2);
-	glBegin(GL_LINE_LOOP);
-	glColor4f(0.2f, 0.2f, 1.0f, 0.3f);
-	glVertex2f(x-1, y-1);
-	glVertex2f(x+w+1, y-1);
-	glVertex2f(x+w+1, y+h+1);
-	glVertex2f(x-1, y+h+1);
-	glColor4f(0.2f, 0.2f, 1.0f, 0.7f);
-	glVertex2f(x, y);
-	glVertex2f(x+w, y);
-	glVertex2f(x+w, y+h);
-	glVertex2f(x, y+h);
-	glColor4f(0.2f, 0.2f, 1.0f, 1.0f);
-	glVertex2f(x+1, y+1);
-	glVertex2f(x+w-1, y+1);
-	glVertex2f(x+w-1, y+h-1);
-	glVertex2f(x+1, y+h-1);
-	glEnd();
 }
 
 ////////////////////////////////////////
@@ -541,7 +513,13 @@ static void view2d(int x, int y, int w, int h)
 
 static void close_cb()
 {
+	if (windows[1].type != WINDOW_TYPE_SPLIT_X &&
+			windows[1].type != WINDOW_TYPE_SPLIT_Y)
+		return;
+
 	mode = MODE_WIN_CLOSING;
+	win_close_ticks = wm_ticks();
+	win_close_ratio = windows[edge].ratio;
 	wm_require_refresh();
 }
 
@@ -552,6 +530,7 @@ static void split_y_cb()
 
 static void split_x_cb()
 {
+	mode = MODE_WIN_SPLIT_X;
 }
 
 ////////////////////////////////////////

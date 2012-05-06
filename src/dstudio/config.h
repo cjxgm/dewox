@@ -12,7 +12,7 @@
 #define __DSTUDIO_CONFIG_H
 
 #define WM_MAX_WINDOW_CNT				256
-#define WM_MAX_WINDOW_ENTRY_CNT			16
+#define WM_MAX_EDITOR_CNT				16
 
 #endif
 
