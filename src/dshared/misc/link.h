@@ -8,8 +8,8 @@
  * Copyright (C) eXerigumo Clanjor (哆啦比猫/兰威举).
  ************************************************************/
 
-#ifndef __LINK_H
-#define __LINK_H
+#ifndef __D_LINK_H
+#define __D_LINK_H
 
 
 

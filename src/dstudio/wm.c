@@ -15,9 +15,15 @@
 #include "editor/editor.h"
 #include <GL/glut.h>
 #include <stdio.h>
+#include <pthread.h>
 
 int wm_win_w = 640;
 int wm_win_h = 480;
+
+// for init animation
+static int stage = 0;
+static int init_percent = 0;
+static int init_percent_current = 0;
 
 #define MODE_EDGE_SELECTED		1
 #define MODE_WIN_CLOSING		2
@@ -83,6 +89,10 @@ static void split_win(int type, float ratio);
 static void render(int win, int x, int y, int w, int h);
 static void view2d(int x, int y, int w, int h);
 
+// threads
+static pthread_t thread_id_init;
+static void * thread_init(void * __unused__);
+
 ////////////////////////////////////////
 //
 // externals
@@ -91,8 +101,9 @@ static void view2d(int x, int y, int w, int h);
 inline void wm_init()
 {
 	// init glut
-	int argc = 0;
-	glutInit(&argc, NULL);
+	int argc = 1;
+	char * argv[] = {"dstudio"};	// this sucks!!!
+	glutInit(&argc, argv);
 
 	// create render window
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
@@ -102,18 +113,16 @@ inline void wm_init()
 	// bind events
 	glutDisplayFunc(&wm_require_refresh);
 	glutReshapeFunc(&resize);
-	glutPassiveMotionFunc(&hover);
-	glutMotionFunc(&drag);
-	glutMouseFunc(&click);
 
 	// setup blank color
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
 	// setup anti-aliasing for points and lines
-	glEnable(GL_POINT_SMOOTH);
-	glEnable(GL_LINE_SMOOTH);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_POINT_SMOOTH);
+	glEnable(GL_LINE_SMOOTH);
+	glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
 	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 
 	// init windows
@@ -177,10 +186,43 @@ void wm_register_editor(const char * name,
 
 static void idle()
 {
-	glutIdleFunc(NULL);
+	float logosize[2];
+	static long logotime = 0;
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	render(1, 0, 0, wm_win_w, wm_win_h);
+	switch (stage) {
+		case 0: // start init thread
+			pthread_create(&thread_id_init, PTHREAD_CREATE_JOINABLE, &thread_init, NULL);
+			stage++;
+			break;
+		case 1: // draw init animation
+			if (init_percent_current < init_percent)
+				init_percent_current++;
+			d_logo_get_size(&logosize[0], &logosize[1]);
+			if (init_percent_current == 100) {
+				logotime = wm_ticks();
+				init_percent_current++;
+			}
+			view2d(0, 0, wm_win_w, wm_win_h);
+			if (d_logo_draw_init((wm_win_w-logosize[0]) / 2.0f,
+								 (wm_win_h-logosize[1]) / 2.0f,
+								 (init_percent_current > 100),
+									(init_percent_current <= 100 ?
+									 init_percent_current :
+									 wm_ticks() - logotime)))
+				stage++;
+			break;
+		case 2: // data init done, init events
+			glutPassiveMotionFunc(&hover);
+			glutMotionFunc(&drag);
+			glutMouseFunc(&click);
+			stage++;
+			break;
+		case 3: // events init done, render UI
+			glutIdleFunc(NULL);
+			render(1, 0, 0, wm_win_w, wm_win_h);
+			break;
+	}
 	glutSwapBuffers();
 }
 
@@ -188,6 +230,9 @@ static void resize(int w, int h)
 {
 	wm_win_w = w;
 	wm_win_h = h;
+
+	active_win = 0;
+	edge = 0;
 }
 
 static void hover(int mx, int my)
@@ -481,7 +526,7 @@ static void render(int win, int x, int y, int w, int h)
 
 	// window closing animation
 	if (mode == MODE_WIN_CLOSING) {
-		windows[edge].ratio = firp_out(wm_ticks()-win_close_ticks,
+		windows[edge].ratio = ferp_out(wm_ticks()-win_close_ticks,
 				0, 300, win_close_ratio,
 				(active_win == windows[edge].child[1]));
 		if (wm_ticks()-win_close_ticks > 300) {
@@ -533,5 +578,23 @@ static void split_y_cb()
 static void split_x_cb()
 {
 	mode = MODE_WIN_SPLIT_X;
+}
+
+////////////////////////////////////////
+//
+// Threads
+//
+
+static void * thread_init(void * __unused__)
+{
+	long t;
+
+	init_percent = 10;
+
+	t = wm_ticks();
+	while (wm_ticks() - t < 1000);
+	init_percent = 100;
+
+	return NULL;
 }
 

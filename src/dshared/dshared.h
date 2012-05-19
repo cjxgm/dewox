@@ -14,8 +14,9 @@
 #include "config.h"
 
 #include "misc/link.h"
+#include "misc/logo.h"
 #include "font/font.h"
-#include "math/irp.h"
+#include "math/erp.h"
 
 #endif
 

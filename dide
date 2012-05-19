@@ -1,0 +1,55 @@
+#!/bin/bash
+# Dewox IDE
+
+function dide_main()
+{
+	while true; do
+		dialog --backtitle "Dewox IDE" \
+			--title "Operation" \
+			--menu "What would you do?" 0 0 0\
+				c "Compile" \
+				d "compile in Debug mode" \
+				r "Run" \
+				g "run in Gdb" \
+				l "cLean" \
+				e "Edit" \
+				x "eXit" 2> /tmp/dide
+		result=`cat /tmp/dide`
+		case $result in
+			"c")
+				./cjbs
+				;;
+			"d")
+				./cjbs debug
+				;;
+			"r")
+				./cjbs -
+				;;
+			"g")
+				./cjbs -debug
+				;;
+			"l")
+				./cjbs clean
+				;;
+			"e")
+				dide_edit
+				;;
+			"x")
+				exit 0
+				;;
+		esac
+	done
+}
+
+function dide_edit()
+{
+	ls src > /tmp/dide
+	awk '{print NR," ", $0}' /tmp/dide
+	read x
+	dialog --backtitle "Dewox IDE" \
+		--title "Select a module" \
+		--dselect ./src/ 0 0
+}
+
+dide_main $*
+

@@ -60,6 +60,11 @@ static void render(int w, int h)
 	glVertex2f(136, 80);
 	glEnd();
 	font_render("Window Killer", 140, 70);
+
+	// draw the logo!
+	float logosize[2];
+	d_logo_get_size(&logosize[0], &logosize[1]);
+	d_logo_draw((w-logosize[0]) / 2.0f, (h-logosize[1]) / 2.0f);
 }
 
 static void hover(int x, int y, int w, int h)

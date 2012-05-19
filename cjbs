@@ -17,8 +17,8 @@
 SRCDIR="src/dstudio src/dshared"
 SRCSUFFIX='.c'
 DESTNAME="dstudio"
-CCFLAGS="-Wall -O3"
-LDFLAGS="-lm -lglut -lGL"
+CCFLAGS="-Wall -O3 -s"
+LDFLAGS="-lm -lglut -lGL -lpthread"
 
 ########################################
 #
@@ -32,6 +32,15 @@ function main()
 			echo -e "\e[1;32m> running $2\e[m"
 			./$DESTNAME
 			echo -e "\e[1;36m: done\e[m"
+			;;
+		"-debug")
+			echo -e "\e[1;32m> running $2\e[m"
+			gdb ./$DESTNAME
+			echo -e "\e[1;36m: done\e[m"
+			;;
+		"debug")
+			CCFLAGS="-Wall -g"
+			main
 			;;
 		"clean")
 			for d in $SRCDIR; do

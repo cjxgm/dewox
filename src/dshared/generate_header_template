@@ -1,6 +1,10 @@
+#!/bin/bash
+
+headername="__D_$(basename $1 .h | awk '$0=toupper($0)')_H"
+cat > $1 << EOF
 
 /************************************************************
- * dewox: font.h
+ * dewox: $(basename $1)
  *
  * Licensed under GPLv2.
  * ABSOLUTELY NO WARRANTY!
@@ -8,11 +12,11 @@
  * Copyright (C) eXerigumo Clanjor (哆啦比猫/兰威举).
  ************************************************************/
 
-#ifndef __D_FONT_H
-#define __D_FONT_H
+#ifndef $headername
+#define $headername
 
-void font_render(const char * str, int x, int y);
-int font_width(const char * str);
 
 #endif
+
+EOF
 
