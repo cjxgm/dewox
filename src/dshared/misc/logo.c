@@ -42,7 +42,7 @@ void d_logo_draw(float x, float y)
 int d_logo_draw_init(float x, float y, int stage, int param)
 {
 	static char buf[4];
-	static char title[] = "A Procedural Generation Studio";
+	static char title[] = "Where there is a hacker, there is art.";
 	if (stage == 0) {
 		glLineWidth(3.0f);
 		glColor3f(1.0f, 0.5f, 0.2f);

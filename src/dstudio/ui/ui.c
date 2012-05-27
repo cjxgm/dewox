@@ -61,12 +61,12 @@ void draw_outline(int x, int y, int w, int h)
 {
 	glLineWidth(2);
 	glBegin(GL_LINE_LOOP);
-	glColor4f(0.2f, 0.2f, 1.0f, 0.3f);
+	glColor4f(0.2f, 0.2f, 1.0f, 0.2f);
 	glVertex2f(x-1, y-1);
 	glVertex2f(x+w+1, y-1);
 	glVertex2f(x+w+1, y+h+1);
 	glVertex2f(x-1, y+h+1);
-	glColor4f(0.2f, 0.2f, 1.0f, 0.7f);
+	glColor4f(0.2f, 0.2f, 1.0f, 0.6f);
 	glVertex2f(x, y);
 	glVertex2f(x+w, y);
 	glVertex2f(x+w, y+h);

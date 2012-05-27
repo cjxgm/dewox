@@ -124,14 +124,7 @@ void ui_menu_click(UIMenu menu[], UIMenuParam * param,
 					if (m->data) ((void (*)())m->data)();
 				break;
 			case UI_MENU_EDITOR_SELECTOR:
-				/*
-				if (btn == WM_BUTTON_LEFT)
-					*(int *)m->data = (*(int *)m->data-3 + 1) %
-							(wm_editor_cnt-3) + 3;
-				else if (btn == WM_BUTTON_RIGHT)
-					*(int *)m->data = (*(int *)m->data-3 - 1 +
-							wm_editor_cnt-3) % (wm_editor_cnt-3) + 3;
-				*/
+				if (btn != WM_BUTTON_LEFT) break;
 				editor_active = &param->active;
 				editor_type = m->data;
 				editor_selected = *editor_type;
@@ -173,16 +166,18 @@ static void editor_selector_render(int w, int h)
 			editor_selector_x + editor_selector_w,
 			editor_selector_y + editor_selector_h);
 
+	glPointSize(1.0f);
 	for (i=3; i<wm_editor_cnt; i++) {
 		int x = editor_selector_x + 6;
 		int y = editor_selector_y + 2 + (i-3)*20;
 
-		if (i == editor_selected)
+		if (i == editor_selected) {
 			draw_box_up(editor_selector_x, y,
 						editor_selector_w, 20,
 						0.2f, 0.5f, 1.0f);
-		glColor3f(0.8f, 0.8f, 0.8f);
-		glPointSize(1.0f);
+			glColor3f(0.0f, 0.0f, 0.0f);
+		}
+		else glColor3f(0.8f, 0.8f, 0.8f);
 		font_render(wm_get_editor(i)->name, x, y+2);
 	}
 
