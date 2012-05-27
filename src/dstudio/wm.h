@@ -42,6 +42,7 @@ typedef void (EditorKeypressFunc)(int key, int w, int h);
 typedef struct EditorInfo
 {
 	const char * name;
+	// FIXME: Prefix 'const' to them
 	EditorRenderFunc	* render;
 	EditorHoverFunc		* hover;
 	EditorClickFunc		* click;
