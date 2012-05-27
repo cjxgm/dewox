@@ -8,16 +8,10 @@
  * Copyright (C) eXerigumo Clanjor (哆啦比猫/兰威举).
  ************************************************************/
 
-#include "../wm.h"
+#include "editor_decl.h"
 #include "../ui/ui.h"
 #include "../../dshared/dshared.h"
-#include <GL/gl.h>
 #include <stdio.h>
-
-static void render(int w, int h);
-static void hover(int x, int y, int w, int h);
-static void click(int x, int y, int w, int h);
-static void drag(int x, int y, int w, int h);
 
 static float r = 1.0f;
 static float g = 0.5f;
@@ -27,7 +21,7 @@ static int active_slider = 0;
 
 void editor_color_init()
 {
-	wm_register_editor("Color Picker", render, hover, click, drag);
+	REGISTER_EDITOR("Color Picker");
 }
 
 static void render(int w, int h)
@@ -119,9 +113,10 @@ static void hover(int x, int y, int w, int h)
 	}
 }
 
-static void click(int x, int y, int w, int h)
+static void click(int x, int y, int w, int h, int btn, int stt)
 {
-	drag(x, y, w, h);
+	if (btn == WM_BUTTON_LEFT && stt == WM_BUTTON_DOWN)
+		drag(x, y, w, h);
 }
 
 static void drag(int x, int y, int w, int h)
@@ -139,5 +134,9 @@ static void drag(int x, int y, int w, int h)
 	}
 
 	wm_require_refresh();
+}
+
+static void keypress(int key, int w, int h)
+{
 }
 

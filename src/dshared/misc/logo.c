@@ -97,7 +97,7 @@ int d_logo_draw_init(float x, float y, int stage, int param)
 			font_render(title, x + 55-(font_width(title)>>1),
 							   y - b*12);
 		}
-		else if (param < 4000) {
+		else if (param < 2500) {
 			d_logo_draw(x, y + 12);
 			glPointSize(1.0f);
 			glColor3f(0.5f, 1.0f, 0.2f);

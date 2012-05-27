@@ -34,7 +34,7 @@ void ui_menu_draw(UIMenu menu[], UIMenuParam * param, int x, int y);
 void ui_menu_hover(UIMenu menu[], UIMenuParam * param,
 		int x, int y, int mx, int my);
 void ui_menu_click(UIMenu menu[], UIMenuParam * param,
-		int x, int y, int mx, int my);
+		int x, int y, int mx, int my, int btn, int stt);
 
 #endif
 

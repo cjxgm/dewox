@@ -80,6 +80,8 @@ static struct WindowInfo
 static EditorInfo editors[WM_MAX_EDITOR_CNT];
 int wm_editor_cnt = 0;
 
+static CaptureInfo cap;
+
 static int alloc_win();
 static void free_win(int win);
 static void close_win();
@@ -136,9 +138,9 @@ inline void wm_init()
 	windows[WM_MAX_WINDOW_CNT-1].child[0] = 0;
 
 	// register internal editors
-	wm_register_editor("unused", NULL, NULL, NULL, NULL);
-	wm_register_editor("split-x", NULL, NULL, NULL, NULL);
-	wm_register_editor("split-y", NULL, NULL, NULL, NULL);
+	wm_register_editor("unused", NULL, NULL, NULL, NULL, NULL);
+	wm_register_editor("split-x", NULL, NULL, NULL, NULL, NULL);
+	wm_register_editor("split-y", NULL, NULL, NULL, NULL, NULL);
 	// register external editors
 	editor_init();
 
@@ -162,6 +164,21 @@ inline int wm_ticks()
 	return glutGet(GLUT_ELAPSED_TIME);
 }
 
+inline int wm_mods()
+{
+	return glutGetModifiers();
+}
+
+inline int wm_active_win_x()
+{
+	return win_x;
+}
+
+inline int wm_active_win_y()
+{
+	return win_y;
+}
+
 inline EditorInfo * wm_get_editor(int id)
 {
 	return &editors[id];
@@ -169,14 +186,39 @@ inline EditorInfo * wm_get_editor(int id)
 
 void wm_register_editor(const char * name,
 		EditorRenderFunc * render, EditorHoverFunc * hover,
-		EditorClickFunc * click, EditorDragFunc * drag)
+		EditorClickFunc * click, EditorDragFunc * drag,
+		EditorKeypressFunc * keypress)
 {
-	editors[wm_editor_cnt].name   = name;
-	editors[wm_editor_cnt].render = render;
-	editors[wm_editor_cnt].hover  = hover;
-	editors[wm_editor_cnt].click  = click;
-	editors[wm_editor_cnt].drag   = drag;
+	editors[wm_editor_cnt].name		= name;
+	editors[wm_editor_cnt].render	= render;
+	editors[wm_editor_cnt].hover	= hover;
+	editors[wm_editor_cnt].click	= click;
+	editors[wm_editor_cnt].drag		= drag;
+	editors[wm_editor_cnt].keypress	= keypress;
 	wm_editor_cnt++;
+}
+
+void wm_capture(void * data,
+		EditorRenderFunc * render, EditorHoverFunc * hover,
+		EditorClickFunc * click, EditorDragFunc * drag,
+		EditorKeypressFunc * keypress)
+{
+	cap.name	 = data;	// 'name' is just a pointer
+	cap.render	 = render;
+	cap.hover	 = hover;
+	cap.click	 = click;
+	cap.drag	 = drag;
+	cap.keypress = keypress;
+}
+
+inline void wm_uncapture()
+{
+	cap.name = NULL;
+}
+
+inline void * wm_capdata()
+{
+	return (void *)cap.name;
 }
 
 ////////////////////////////////////////
@@ -221,6 +263,11 @@ static void idle()
 		case 3: // events init done, render UI
 			glutIdleFunc(NULL);
 			render(1, 0, 0, wm_win_w, wm_win_h);
+			if (wm_capdata() && cap.render) {
+				view2d(0, 0, wm_win_w, wm_win_h);
+				// no need for specifying width and height, so set to 0.
+				cap.render(0, 0);
+			}
 			break;
 	}
 	glutSwapBuffers();
@@ -249,6 +296,11 @@ static void hover(int mx, int my)
 	if (mode == MODE_WIN_SPLIT_X) {
 		edge_x = mx - win_x;
 		wm_require_refresh();
+		return;
+	}
+
+	if (wm_capdata()) {
+		if (cap.hover) cap.hover(mx, my, wm_win_w, wm_win_h);
 		return;
 	}
 
@@ -376,16 +428,21 @@ static void click(int btn, int stt, int mx, int my)
 		return;
 	}
 
-	if (active_win && btn == GLUT_LEFT_BUTTON && stt == GLUT_DOWN) {
+	if (wm_capdata()) {
+		if (cap.click) cap.click(mx, my, wm_win_w, wm_win_h, btn, stt);
+		return;
+	}
+
+	if (active_win) {
 		// wm_menu[3] is the editor selector
 		wm_menu[3].data = &windows[active_win].type;
 		ui_menu_click(wm_menu, &windows[active_win].menu_param,
-				0, 0, mx, my);
+				0, 0, mx, my, btn, stt);
 
-		editors[windows[active_win].type].click(mx-win_x, my-win_y-25,
-				win_w, win_h-25);
+		if (my >= win_y + 25)
+			editors[windows[active_win].type].click(mx-win_x, my-win_y-25,
+					win_w, win_h-25, btn, stt);
 	}
-
 }
 
 static void drag(int mx, int my)
@@ -417,6 +474,11 @@ static void drag(int mx, int my)
 				break;
 		}
 		active_win = 0;
+		return;
+	}
+
+	if (wm_capdata()) {
+		if (cap.drag) cap.drag(mx, my, wm_win_w, wm_win_h);
 		return;
 	}
 
@@ -587,14 +649,11 @@ static void split_x_cb()
 
 static void * thread_init(void * __unused__)
 {
-	long t;
+	// more initialization codes here
+	// you can set <init_percent> to the desired init progress
+	// once it gets to 100, the init is done.
 
-	init_percent = 10;
-
-	t = wm_ticks();
-	while (wm_ticks() - t < 1000);
 	init_percent = 100;
-
 	return NULL;
 }
 

@@ -8,18 +8,12 @@
  * Copyright (C) eXerigumo Clanjor (哆啦比猫/兰威举).
  ************************************************************/
 
-#include "../wm.h"
+#include "editor_decl.h"
 #include "../../dshared/dshared.h"
-#include <GL/gl.h>
-
-static void render(int w, int h);
-static void hover(int x, int y, int w, int h);
-static void click(int x, int y, int w, int h);
-static void drag(int x, int y, int w, int h);
 
 void editor_welcome_init()
 {
-	wm_register_editor("Welcome", render, hover, click, drag);
+	REGISTER_EDITOR("Welcome");
 }
 
 static void render(int w, int h)
@@ -71,11 +65,15 @@ static void hover(int x, int y, int w, int h)
 {
 }
 
-static void click(int x, int y, int w, int h)
+static void click(int x, int y, int w, int h, int btn, int stt)
 {
 }
 
 static void drag(int x, int y, int w, int h)
+{
+}
+
+static void keypress(int key, int w, int h)
 {
 }
 

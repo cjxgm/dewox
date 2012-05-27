@@ -14,6 +14,18 @@
 #include "../../dshared/dshared.h"
 #include <GL/gl.h>
 
+static int * editor_type;
+static int * editor_active;
+static int editor_selected;
+static int editor_selector_x;
+static int editor_selector_y;
+static int editor_selector_w;
+static int editor_selector_h;
+static void editor_selector_render(int w, int h);
+static void editor_selector_click(int x, int y, int w, int h,
+		int btn, int stt);
+static void editor_selector_drag(int x, int y, int w, int h);
+
 void ui_menu_draw(UIMenu menu[], UIMenuParam * param, int x, int y)
 {
 	int i, w;
@@ -77,6 +89,7 @@ void ui_menu_hover(UIMenu menu[], UIMenuParam * param,
 				x += w + 12;
 				break;
 			case UI_MENU_EDITOR_SELECTOR:
+				editor_selector_x = wm_active_win_x() + x;
 				w = font_width(wm_get_editor(*(int *)menu[i].data)->name);
 				if (mx > x+2 && mx < x+w+12) {
 					if (param->active != i) {
@@ -98,21 +111,122 @@ void ui_menu_hover(UIMenu menu[], UIMenuParam * param,
 }
 
 void ui_menu_click(UIMenu menu[], UIMenuParam * param,
-		int x, int y, int mx, int my)
+		int x, int y, int mx, int my, int btn, int stt)
 {
+	int i;
+
 	if (param->active == -1) return;
 	UIMenu * m = &menu[param->active];
-	switch (m->type) {
-		case UI_MENU_FUNC:
-			if (m->data) ((void (*)())m->data)();
-			break;
-		case UI_MENU_EDITOR_SELECTOR:
-			*(int *)m->data = (*(int *)m->data-3 + 1) %
-					(wm_editor_cnt-3) + 3;
-			wm_require_refresh();
-			break;
-		default:
-			break;
+	if (stt == WM_BUTTON_DOWN) {
+		switch (m->type) {
+			case UI_MENU_FUNC:
+				if (btn == WM_BUTTON_LEFT)
+					if (m->data) ((void (*)())m->data)();
+				break;
+			case UI_MENU_EDITOR_SELECTOR:
+				/*
+				if (btn == WM_BUTTON_LEFT)
+					*(int *)m->data = (*(int *)m->data-3 + 1) %
+							(wm_editor_cnt-3) + 3;
+				else if (btn == WM_BUTTON_RIGHT)
+					*(int *)m->data = (*(int *)m->data-3 - 1 +
+							wm_editor_cnt-3) % (wm_editor_cnt-3) + 3;
+				*/
+				editor_active = &param->active;
+				editor_type = m->data;
+				editor_selected = *editor_type;
+				// 'editor_selector_x' is initialized in 'ui_menu_hover'
+				// +12 for border blanks
+				editor_selector_h = (wm_editor_cnt - 3) * 20 + 4;
+				editor_selector_y = wm_active_win_y() -
+									20 * (editor_selected - 3);
+				editor_selector_w = 0;
+				for (i=3; i<wm_editor_cnt; i++) {
+					int w = font_width(wm_get_editor(i)->name);
+					if (w > editor_selector_w)
+						editor_selector_w = w;
+				}
+				editor_selector_w += 12;
+				if (editor_selector_x + editor_selector_w > wm_win_w)
+					editor_selector_x = wm_win_w - editor_selector_w;
+				wm_capture(&editor_selected, editor_selector_render, NULL,
+						editor_selector_click, editor_selector_drag, NULL);
+				wm_require_refresh();
+				break;
+			default:
+				break;
+		}
+	}
+}
+
+////////////////////////////////////////
+//
+// editor selector
+//
+
+static void editor_selector_render(int w, int h)
+{
+	int i;
+
+	glColor4f(0.0f, 0.0f, 0.0f, 0.9f);
+	glRectf(editor_selector_x, editor_selector_y,
+			editor_selector_x + editor_selector_w,
+			editor_selector_y + editor_selector_h);
+
+	for (i=3; i<wm_editor_cnt; i++) {
+		int x = editor_selector_x + 6;
+		int y = editor_selector_y + 2 + (i-3)*20;
+
+		if (i == editor_selected)
+			draw_box_up(editor_selector_x, y,
+						editor_selector_w, 20,
+						0.2f, 0.5f, 1.0f);
+		glColor3f(0.8f, 0.8f, 0.8f);
+		glPointSize(1.0f);
+		font_render(wm_get_editor(i)->name, x, y+2);
+	}
+
+	draw_outline(editor_selector_x, editor_selector_y,
+				 editor_selector_w, editor_selector_h);
+}
+
+static void editor_selector_click(int x, int y, int w, int h,
+		int btn, int stt)
+{
+	if (btn == WM_BUTTON_RIGHT) {
+		*editor_active = -1;
+		wm_uncapture();
+		wm_require_refresh();
+		return;
+	}
+
+	if (btn == WM_BUTTON_LEFT && stt == WM_BUTTON_UP) {
+		*editor_active = -1;
+		*editor_type = editor_selected;
+		wm_uncapture();
+		wm_require_refresh();
+	}
+}
+
+static void editor_selector_drag(int x, int y, int w, int h)
+{
+	if (editor_selector_y < 0 && y < 10) {
+		editor_selector_y += 4;
+		wm_require_refresh();
+	}
+
+	if (editor_selector_y+editor_selector_h > wm_win_h &&
+			y > wm_win_h-10) {
+		editor_selector_y -= 4;
+		wm_require_refresh();
+	}
+
+	int t = (y - editor_selector_y - 2) / 20 + 3;
+	if (t < 3) t = 3;
+	else if (t >= wm_editor_cnt) t = wm_editor_cnt - 1;
+	if (t != editor_selected) {
+		editor_selected = t;
+		wm_require_refresh();
 	}
 }
 

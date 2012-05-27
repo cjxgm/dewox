@@ -3,3 +3,6 @@
 
 	void editor_color_init();
 	editor_color_init();
+
+	void editor_vkeybd_init();
+	editor_vkeybd_init();
