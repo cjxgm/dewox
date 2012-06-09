@@ -10,8 +10,11 @@
 
 #include "editor_decl.h"
 #include "../ui/ui.h"
-#include "../../dshared/dshared.h"
 #include <stdio.h>
+
+static UIMenu menu[] = {
+	{UI_MENU_DONE}
+};
 
 static float r = 1.0f;
 static float g = 0.5f;

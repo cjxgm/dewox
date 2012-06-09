@@ -9,8 +9,11 @@
  ************************************************************/
 
 #include "editor_decl.h"
-#include "../../dshared/dshared.h"
 #include <stdio.h>
+
+static UIMenu menu[] = {
+	{UI_MENU_DONE}
+};
 
 static char blacks[7] = {1, 1, 1, 0, 1, 1, 0};
 static int sx = 0;

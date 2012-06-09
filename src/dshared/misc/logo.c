@@ -53,6 +53,7 @@ int d_logo_draw_init(float x, float y, int stage, int param)
 		font_render(buf, x + 55-(font_width(buf)>>1), y+22);
 	}
 	else if (stage == 1) {
+		if (param < 0) param = 0;
 		if (param < 200) {
 			float a = ferp_out(param, 0, 200, 1, 0);
 			glLineWidth(3.0f);
@@ -97,14 +98,14 @@ int d_logo_draw_init(float x, float y, int stage, int param)
 			font_render(title, x + 55-(font_width(title)>>1),
 							   y - b*12);
 		}
-		else if (param < 2500) {
+		else {
 			d_logo_draw(x, y + 12);
 			glPointSize(1.0f);
 			glColor3f(0.5f, 1.0f, 0.2f);
 			font_render(title, x + 55-(font_width(title)>>1),
-							   y - 12);
+								   y - 12);
+			if (param >= 2500) return 1;
 		}
-		else return 1;
 	}
 	return 0;
 }

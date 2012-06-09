@@ -26,15 +26,20 @@ static void editor_selector_click(int x, int y, int w, int h,
 		int btn, int stt);
 static void editor_selector_drag(int x, int y, int w, int h);
 
+static int button_pressed = 0;
+static void button_click(int x, int y, int w, int h, int btn, int stt);
+static void toggle_click(int x, int y, int w, int h, int btn, int stt);
+
 void ui_menu_draw(UIMenu menu[], UIMenuParam * param, int x, int y)
 {
 	int i, w;
+	int o = 0;
 	const char * s;
 	for (i=0; menu[i].type; i++) {
 		switch (menu[i].type) {
 			case UI_MENU_FUNC:
 				w = font_width(menu[i].label);
-				if (i == param->active) {
+				if (i+o == param->active) {
 					glColor3f(0.2f, 0.2f, 1.0f);
 					glBegin(GL_QUADS);
 					glVertex2f(x+2, y+3);
@@ -49,12 +54,46 @@ void ui_menu_draw(UIMenu menu[], UIMenuParam * param, int x, int y)
 				x += w + 12;
 				break;
 			case UI_MENU_EDITOR_SELECTOR:
+				if (!menu[i].data) break;
 				s = wm_get_editor(*(int*)menu[i].data)->name;
 				w = font_width(s);
-				draw_button(x+2, y+3, w+12, 25-6, (i == param->active));
+				draw_button(x+2, y+3, w+12, 25-6, (i+o == param->active));
 				glColor3f(1.0f, 1.0f, 1.0f);
 				glPointSize(1.0f);
 				font_render(s, x+6, y+3);
+				x += w + 12;
+				break;
+			case UI_MENU_SUBMENU:
+				if (!menu[i].data) break;
+				menu = menu[i].data;
+				o = i;
+				i = -1;
+				x += 10;
+				break;
+			case UI_MENU_BUTTON:
+				w = font_width(menu[i].label);
+				draw_button(x+2, y+3, w+10, y+19,
+						(i+o == param->active ?
+							(button_pressed ?
+								UI_BUTTON_STATE_PRESSED :
+								UI_BUTTON_STATE_ACTIVE) :
+							UI_BUTTON_STATE_NORMAL));
+				glColor3f(0.8f, 0.8f, 0.8f);
+				glPointSize(1.0f);
+				font_render(menu[i].label, x+6, y+3);
+				x += w + 12;
+				break;
+			case UI_MENU_TOGGLE:
+				w = font_width(menu[i].label);
+				draw_button(x+2, y+3, w+10, y+19,
+						(((int (*)(int))menu[i].data)(-1) ?
+							UI_BUTTON_STATE_TOGGLED :
+							(i+o == param->active ?
+								UI_BUTTON_STATE_ACTIVE :
+								UI_BUTTON_STATE_NORMAL)));
+				glColor3f(0.8f, 0.8f, 0.8f);
+				glPointSize(1.0f);
+				font_render(menu[i].label, x+6, y+3);
 				x += w + 12;
 				break;
 			default:
@@ -67,6 +106,7 @@ void ui_menu_hover(UIMenu menu[], UIMenuParam * param,
 		int x, int y, int mx, int my)
 {
 	int i, w;
+	int o = 0;
 	for (i=0; menu[i].type; i++) {
 		if (my <= y+3 || my >= y+25-3) {
 			if (param->active != -1) {
@@ -78,10 +118,12 @@ void ui_menu_hover(UIMenu menu[], UIMenuParam * param,
 
 		switch (menu[i].type) {
 			case UI_MENU_FUNC:
+			case UI_MENU_BUTTON:
+			case UI_MENU_TOGGLE:
 				w = font_width(menu[i].label);
 				if (mx > x+2 && mx < x+w+12) {
-					if (param->active != i) {
-						param->active = i;
+					if (param->active != i+o) {
+						param->active = i+o;
 						wm_require_refresh();
 					}
 					return;
@@ -89,6 +131,7 @@ void ui_menu_hover(UIMenu menu[], UIMenuParam * param,
 				x += w + 12;
 				break;
 			case UI_MENU_EDITOR_SELECTOR:
+				if (!menu[i].data) break;
 				editor_selector_x = wm_active_win_x() + x;
 				w = font_width(wm_get_editor(*(int *)menu[i].data)->name);
 				if (mx > x+2 && mx < x+w+12) {
@@ -99,6 +142,13 @@ void ui_menu_hover(UIMenu menu[], UIMenuParam * param,
 					return;
 				}
 				x += w + 12;
+				break;
+			case UI_MENU_SUBMENU:
+				if (!menu[i].data) break;
+				menu = menu[i].data;
+				o = i;
+				i = -1;
+				x += 10;
 				break;
 			default:
 				break;
@@ -114,9 +164,16 @@ void ui_menu_click(UIMenu menu[], UIMenuParam * param,
 		int x, int y, int mx, int my, int btn, int stt)
 {
 	int i;
+	int o = 0;
 
 	if (param->active == -1) return;
-	UIMenu * m = &menu[param->active];
+	for (i=0; i<=param->active; i++) {
+		if (menu[i-o].type == UI_MENU_SUBMENU) {
+			menu = menu[i-o].data;
+			o += i;
+		}
+	}
+	UIMenu * m = &menu[i-o-1];
 	if (stt == WM_BUTTON_DOWN) {
 		switch (m->type) {
 			case UI_MENU_FUNC:
@@ -144,6 +201,17 @@ void ui_menu_click(UIMenu menu[], UIMenuParam * param,
 					editor_selector_x = wm_win_w - editor_selector_w;
 				wm_capture(&editor_selected, editor_selector_render, NULL,
 						editor_selector_click, editor_selector_drag, NULL);
+				wm_require_refresh();
+				break;
+			case UI_MENU_BUTTON:
+				button_pressed = 1;
+				wm_capture(m->data, NULL, NULL, button_click, NULL, NULL);
+				wm_require_refresh();
+				break;
+			case UI_MENU_TOGGLE:
+				i = ((int (*)(int))m->data)(-1);
+				((int (*)(int))m->data)(!i);
+				wm_capture(&i, NULL, NULL, toggle_click, NULL, NULL);
 				wm_require_refresh();
 				break;
 			default:
@@ -225,3 +293,23 @@ static void editor_selector_drag(int x, int y, int w, int h)
 	}
 }
 
+////////////////////////////////////////
+//
+// other captures
+//
+
+static void button_click(int x, int y, int w, int h, int btn, int stt)
+{
+	if (stt == WM_BUTTON_UP) {
+		if (wm_capdata()) ((void (*)())wm_capdata())();
+		wm_uncapture();
+		button_pressed = 0;
+		wm_require_refresh();
+	}
+}
+
+static void toggle_click(int x, int y, int w, int h, int btn, int stt)
+{
+	if (stt == WM_BUTTON_UP)
+		wm_uncapture();
+}

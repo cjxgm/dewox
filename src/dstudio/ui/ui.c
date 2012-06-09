@@ -89,6 +89,9 @@ void draw_button(int x, int y, int w, int h, int state)
 			draw_box_up(x, y, w, h, 0.25, 0.25, 0.25);
 			break;
 		case UI_BUTTON_STATE_PRESSED:
+			draw_box_down(x, y, w, h, 0.2, 0.5, 1.0);
+			break;
+		case UI_BUTTON_STATE_TOGGLED:
 			draw_box_down(x, y, w, h, 1.0, 0.5, 0.2);
 			break;
 	}

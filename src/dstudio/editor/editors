@@ -6,3 +6,9 @@
 
 	void editor_vkeybd_init();
 	editor_vkeybd_init();
+
+	void editor_timeline_init();
+	editor_timeline_init();
+
+	void editor_preview_init();
+	editor_preview_init();

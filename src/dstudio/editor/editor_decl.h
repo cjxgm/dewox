@@ -14,10 +14,11 @@
 #define __EDITOR_DECL_H
 
 #include "../wm.h"
+#include "../../dshared/dshared.h"
 #include <GL/gl.h>
 
 #define REGISTER_EDITOR(NAME) \
-	wm_register_editor(NAME, render, hover, click, drag, keypress);
+	wm_register_editor(NAME, menu, render, hover, click, drag, keypress);
 
 static void render(int w, int h);
 static void hover(int x, int y, int w, int h);

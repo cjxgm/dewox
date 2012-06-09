@@ -11,10 +11,10 @@
 #include "wm.h"
 #include "config.h"
 #include "../dshared/dshared.h"
-#include "ui/ui.h"
 #include "editor/editor.h"
 #include <GL/glut.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <pthread.h>
 
 int wm_win_w = 640;
@@ -52,6 +52,7 @@ static UIMenu wm_menu[] = {
 	{UI_MENU_FUNC, &split_y_cb, "-"},
 	{UI_MENU_FUNC, &split_x_cb, "|"},
 	{UI_MENU_EDITOR_SELECTOR},
+	{UI_MENU_SUBMENU},
 	{UI_MENU_DONE}
 };
 
@@ -61,6 +62,7 @@ static void resize(int w, int h);
 static void hover(int mx, int my);
 static void click(int btn, int stt, int mx, int my);
 static void drag(int mx, int my);
+static void keypress(unsigned char key, int x, int y);
 
 // window management
 #define WINDOW_TYPE_UNUSED		0
@@ -138,9 +140,9 @@ inline void wm_init()
 	windows[WM_MAX_WINDOW_CNT-1].child[0] = 0;
 
 	// register internal editors
-	wm_register_editor("unused", NULL, NULL, NULL, NULL, NULL);
-	wm_register_editor("split-x", NULL, NULL, NULL, NULL, NULL);
-	wm_register_editor("split-y", NULL, NULL, NULL, NULL, NULL);
+	wm_register_editor("unused" , NULL, NULL, NULL, NULL, NULL, NULL);
+	wm_register_editor("split-x", NULL, NULL, NULL, NULL, NULL, NULL);
+	wm_register_editor("split-y", NULL, NULL, NULL, NULL, NULL, NULL);
 	// register external editors
 	editor_init();
 
@@ -151,6 +153,9 @@ inline void wm_init()
 
 inline void wm_mainloop()
 {
+#ifdef WM_FULLSCREEN
+	glutFullScreen();
+#endif
 	glutMainLoop();
 }
 
@@ -184,12 +189,13 @@ inline EditorInfo * wm_get_editor(int id)
 	return &editors[id];
 }
 
-void wm_register_editor(const char * name,
+void wm_register_editor(const char * name, UIMenu * menu,
 		EditorRenderFunc * render, EditorHoverFunc * hover,
 		EditorClickFunc * click, EditorDragFunc * drag,
 		EditorKeypressFunc * keypress)
 {
 	editors[wm_editor_cnt].name		= name;
+	editors[wm_editor_cnt].menu		= menu;
 	editors[wm_editor_cnt].render	= render;
 	editors[wm_editor_cnt].hover	= hover;
 	editors[wm_editor_cnt].click	= click;
@@ -258,6 +264,7 @@ static void idle()
 			glutPassiveMotionFunc(&hover);
 			glutMotionFunc(&drag);
 			glutMouseFunc(&click);
+			glutKeyboardFunc(&keypress);
 			stage++;
 			break;
 		case 3: // events init done, render UI
@@ -391,18 +398,21 @@ static void hover(int mx, int my)
 		}
 	}
 
-	// mouse event for header
-	if (my-win_y < 25) {
-		wm_menu[3].data = &windows[active_win].type;
-		ui_menu_hover(wm_menu, &windows[active_win].menu_param,
-				0, 0, mx-win_x, my-win_y);
-		return;
-	}
-
 	// mouse event for window
-	if (active_win)
-		editors[windows[active_win].type].hover(mx-win_x, my-win_y-25,
-				win_w, win_h-25);
+	if (active_win) {
+		if (my >= win_y + 25)
+			editors[windows[active_win].type].hover(mx-win_x, my-win_y-25,
+					win_w, win_h-25);
+		else {
+			// wm_menu[3] is the editor selector
+			wm_menu[3].data = &windows[active_win].type;
+			// wm_menu[4] is the sub menu of the editor
+			wm_menu[4].data = editors[windows[active_win].type].menu;
+			ui_menu_hover(wm_menu, &windows[active_win].menu_param,
+					0, 0, mx-win_x, my-win_y);
+			return;
+		}
+	}
 }
 
 static void click(int btn, int stt, int mx, int my)
@@ -433,15 +443,20 @@ static void click(int btn, int stt, int mx, int my)
 		return;
 	}
 
-	if (active_win) {
-		// wm_menu[3] is the editor selector
-		wm_menu[3].data = &windows[active_win].type;
-		ui_menu_click(wm_menu, &windows[active_win].menu_param,
-				0, 0, mx, my, btn, stt);
+	if (mode == MODE_EDGE_SELECTED) return;
 
+	if (active_win) {
 		if (my >= win_y + 25)
 			editors[windows[active_win].type].click(mx-win_x, my-win_y-25,
 					win_w, win_h-25, btn, stt);
+		else {
+			// wm_menu[3] is the editor selector
+			wm_menu[3].data = &windows[active_win].type;
+			// wm_menu[4] is the sub menu of the editor
+			wm_menu[4].data = editors[windows[active_win].type].menu;
+			ui_menu_click(wm_menu, &windows[active_win].menu_param,
+					0, 0, mx, my, btn, stt);
+		}
 	}
 }
 
@@ -484,6 +499,15 @@ static void drag(int mx, int my)
 
 	if (active_win)
 		editors[windows[active_win].type].drag(mx-win_x, my-win_y-25,
+				win_w, win_h-25);
+}
+
+static void keypress(unsigned char key, int x, int y)
+{
+	if (key == '\e') exit(0);
+
+	if (active_win)
+		editors[windows[active_win].type].keypress(key,
 				win_w, win_h-25);
 }
 
@@ -543,6 +567,10 @@ static void split_win(int type, float ratio)
 
 static void render(int win, int x, int y, int w, int h)
 {
+	if (d_playing) {
+		wm_require_refresh();
+		d_refresh(wm_ticks());
+	}
 	int t;
 	switch (windows[win].type) {
 		case WINDOW_TYPE_UNUSED: break;
@@ -565,12 +593,15 @@ static void render(int win, int x, int y, int w, int h)
 			}
 			break;
 		default:
+			if (h<=0 || w<=0) break;
 			t = (h<25 ? h : 25);
 			view2d(x, y, w, t);
 			// TODO: draw header
 			draw_box_down(0, 0, w, 25, 0.2, 0.2, 0.2);
 			// wm_menu[3] is the editor selector
 			wm_menu[3].data = &windows[win].type;
+			// wm_menu[4] is the sub menu of the editor
+			wm_menu[4].data = editors[windows[win].type].menu;
 			ui_menu_draw(wm_menu, &windows[win].menu_param, 0, 0);
 			view2d(x, y+t, w, h-t);
 			editors[windows[win].type].render(w, h-t);

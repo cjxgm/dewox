@@ -12,6 +12,7 @@
 #define __WM_H
 
 #include <GL/glut.h>
+#include "ui/ui.h"
 
 // mouse buttons
 #define WM_BUTTON_LEFT		GLUT_LEFT_BUTTON
@@ -42,6 +43,7 @@ typedef void (EditorKeypressFunc)(int key, int w, int h);
 typedef struct EditorInfo
 {
 	const char * name;
+	UIMenu     * menu;
 	// FIXME: Prefix 'const' to them
 	EditorRenderFunc	* render;
 	EditorHoverFunc		* hover;
@@ -69,7 +71,7 @@ inline int  wm_active_win_x();		// get active window's x
 inline int  wm_active_win_y();		// get active window's y
 
 inline EditorInfo * wm_get_editor(int id);
-void wm_register_editor(const char * name,
+void wm_register_editor(const char * name, UIMenu * menu,
 		EditorRenderFunc * render, EditorHoverFunc * hover,
 		EditorClickFunc * click, EditorDragFunc * drag,
 		EditorKeypressFunc * keypress);

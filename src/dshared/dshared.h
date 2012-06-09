@@ -13,6 +13,7 @@
 
 #include "config.h"
 
+#include "core/core.h"
 #include "misc/link.h"
 #include "misc/logo.h"
 #include "font/font.h"

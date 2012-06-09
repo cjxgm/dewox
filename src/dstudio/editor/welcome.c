@@ -9,7 +9,10 @@
  ************************************************************/
 
 #include "editor_decl.h"
-#include "../../dshared/dshared.h"
+
+static UIMenu menu[] = {
+	{UI_MENU_DONE}
+};
 
 void editor_welcome_init()
 {

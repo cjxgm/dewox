@@ -15,6 +15,9 @@
 #define UI_MENU_DONE					0
 #define UI_MENU_FUNC					1
 #define UI_MENU_EDITOR_SELECTOR			2
+#define UI_MENU_SUBMENU					3
+#define UI_MENU_BUTTON					4
+#define UI_MENU_TOGGLE					5
 typedef struct UIMenu
 {
 	int type;
