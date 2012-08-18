@@ -13,9 +13,10 @@
 
 static DParam * config;
 static DParamMeta config_meta[] = {
-	{D_TYPE_FLOAT, "hello", 0.5, 0.0, 1.0, 0.1},
-	{D_TYPE_FLOAT, "hhasjdhsjd", 0.1, 0.0, 1.0, 0.01},
-	{D_TYPE_FLOAT, "hhaasdjdgdgo", 0.2, 0.0, 1.0, 0.1},
+	{D_TYPE_FLOAT, "ranged", 0.2, 0.0, 1.0, 0.01},
+	{D_TYPE_FLOAT, "inf", 0.2},
+	{D_TYPE_VEC  , "vector", 0.5, 0.2, 1.0},
+	{D_TYPE_COLOR, "color", 0.5, 0.8, 0.1},
 	{D_TYPE_DONE}
 };
 
@@ -37,8 +38,8 @@ static void render(int w, int h)
 	glColor3f(0.1, 0.1, 0.1);
 	glRectf(0, 0, w, h);
 
-	static char buf[32];
 	if (!d_active_param) {
+		glColor3f(1.0, 0.5, 0.2);
 		font_render("No Parameters.", 10, h-20);
 		return;
 	}
@@ -52,7 +53,6 @@ static void render(int w, int h)
 	}
 	maxw += 20;
 
-	glPointSize(1);
 	p = d_active_param;
 	while (p->meta->type) {
 		float y = h-10 - 20 - (p-d_active_param)*20;
@@ -60,10 +60,22 @@ static void render(int w, int h)
 		glColor3f(0.2, 0.8, 0.2);
 		font_render(p->meta->name, 10, y);
 
-		sprintf(buf, "%g", p->f);
-		draw_button(maxw, y, w-maxw-10, 18, UI_BUTTON_STATE_NORMAL);
-		glColor3f(1.0, 1.0, 1.0);
-		font_renderw(buf, maxw+10, y, w-maxw-30);
+		switch (p->meta->type) {
+			case D_TYPE_FLOAT:
+				draw_float_box(p, maxw, y, w-maxw-10, 18,
+						UI_BUTTON_STATE_NORMAL);
+				break;
+			case D_TYPE_VEC:
+				draw_vec_box(p, maxw, y, w-maxw-10, 18,
+						UI_BUTTON_STATE_NORMAL, 0);
+				break;
+			case D_TYPE_COLOR:
+				draw_color_box(p, maxw, y, w-maxw-10, 18,
+						UI_BUTTON_STATE_NORMAL, 0);
+				break;
+			default:
+				break;
+		}
 		p++;
 	}
 }

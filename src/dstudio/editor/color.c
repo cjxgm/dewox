@@ -12,9 +12,7 @@
 
 static DParam * config;
 static DParamMeta config_meta[] = {
-	{D_TYPE_FLOAT, "r", 0.8, 0.0, 1.0, 1e-6},
-	{D_TYPE_FLOAT, "g", 0.5, 0.0, 1.0, 1e-6},
-	{D_TYPE_FLOAT, "b", 0.2, 0.0, 1.0, 1e-6},
+	{D_TYPE_COLOR, "background", 0.8, 0.5, 0.2},
 	{D_TYPE_DONE}
 };
 
@@ -33,7 +31,7 @@ void editor_color_init()
 
 static void render(int w, int h)
 {
-	glColor3f(config[0].f, config[1].f, config[2].f);
+	glColor3f(config[0].v[0], config[0].v[1], config[0].v[2]);
 	glRectf(0, 0, w, h);
 }
 

@@ -9,6 +9,7 @@
  ************************************************************/
 
 #include "ui.h"
+#include <stdio.h>
 #include <GL/gl.h>
 
 void draw_edge_y(int x, int h)
@@ -112,5 +113,87 @@ void draw_button(int x, int y, int w, int h, int state)
 	glVertex2f(x+w, y+h);
 	glVertex2f(x, y+h);
 	glEnd();
+}
+
+
+
+
+// parameter widgets
+static char buf[32];
+
+void draw_float_box(DParam * p, int x, int y, int w, int h, int state)
+{
+	glPointSize(1);
+	switch (state) {
+		case UI_BUTTON_STATE_NORMAL:
+			if (p->meta->p2 == p->meta->p3)
+				draw_button(x, y, w, h, UI_BUTTON_STATE_NORMAL);
+			else {
+				draw_button(x, y, w, h, UI_BUTTON_STATE_PRESSED);
+				draw_button(x+1, y+1,
+						lerp(p->f, p->meta->p2, p->meta->p3, 0, w)-2,
+						h-2, UI_BUTTON_STATE_NORMAL);
+			}
+			break;
+	}
+	glColor3f(1.0, 1.0, 1.0);
+	sprintf(buf, "%g", p->f);
+	font_renderw(buf, x+10, y, w-20);
+}
+
+void draw_vec_box(DParam * p, int x, int y, int w, int h,
+		int state, int btn)
+{
+	float ew = w / 3.0f;
+
+	glPointSize(1);
+	switch (state) {
+		case UI_BUTTON_STATE_NORMAL:
+			draw_button(x, y, ew, h, UI_BUTTON_STATE_NORMAL);
+			draw_button(x+ew, y, ew, h, UI_BUTTON_STATE_NORMAL);
+			draw_button(x+ew+ew, y, ew, h, UI_BUTTON_STATE_NORMAL);
+			break;
+	}
+	glColor3f(1.0, 1.0, 1.0);
+	sprintf(buf, "%g", p->v[0]);
+	font_renderw(buf, x+10, y, ew-20);
+	sprintf(buf, "%g", p->v[1]);
+	font_renderw(buf, x+ew+10, y, ew-20);
+	sprintf(buf, "%g", p->v[2]);
+	font_renderw(buf, x+ew+ew+10, y, ew-20);
+}
+
+void draw_color_box(DParam * p, int x, int y, int w, int h,
+		int state, int btn)
+{
+	if (w < 18) return;
+
+	w -= 20;
+	float ew = w / 3.0f;
+
+	glPointSize(1);
+	switch (state) {
+		case UI_BUTTON_STATE_NORMAL:
+			draw_button(x, y, ew, h, UI_BUTTON_STATE_PRESSED);
+			draw_button(x+ew, y, ew, h, UI_BUTTON_STATE_PRESSED);
+			draw_button(x+ew+ew, y, ew, h, UI_BUTTON_STATE_PRESSED);
+			draw_button(x+1, y+1, ew*p->v[0]-2, h-2,
+					UI_BUTTON_STATE_NORMAL);
+			draw_button(x+ew+1, y+1, ew*p->v[1]-2, h-2,
+					UI_BUTTON_STATE_NORMAL);
+			draw_button(x+ew+ew+1, y+1, ew*p->v[2]-2, h-2,
+					UI_BUTTON_STATE_NORMAL);
+			break;
+	}
+	glColor3f(1.0, 1.0, 1.0);
+	sprintf(buf, "%g", p->v[0]);
+	font_renderw(buf, x+10, y, ew-20);
+	sprintf(buf, "%g", p->v[1]);
+	font_renderw(buf, x+ew+10, y, ew-20);
+	sprintf(buf, "%g", p->v[2]);
+	font_renderw(buf, x+ew+ew+10, y, ew-20);
+
+	glColor3f(p->v[0], p->v[1], p->v[2]);
+	glRectf(x+w+2, y, x+w+20, y+h);
 }
 

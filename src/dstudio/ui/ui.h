@@ -12,6 +12,7 @@
 #define __UI_H
 
 #include "menu.h"
+#include "../../dshared/dshared.h"
 
 
 
@@ -29,6 +30,16 @@ void draw_outline(int x, int y, int w, int h);
 #define UI_BUTTON_STATE_PRESSED		2
 #define UI_BUTTON_STATE_TOGGLED		3
 void draw_button(int x, int y, int w, int h, int state);
+
+
+
+
+// parameter widgets
+void draw_float_box(DParam * p, int x, int y, int w, int h, int state);
+void draw_vec_box(DParam * p, int x, int y, int w, int h,
+		int state, int btn);
+void draw_color_box(DParam * p, int x, int y, int w, int h,
+		int state, int btn);
 
 #endif
 
