@@ -125,6 +125,9 @@ void draw_float_box(DParam * p, int x, int y, int w, int h, int state)
 {
 	glPointSize(1);
 	switch (state) {
+		case UI_BUTTON_STATE_PRESSED:
+			state = UI_BUTTON_STATE_TOGGLED;
+			// no break;
 		case UI_BUTTON_STATE_NORMAL:
 		case UI_BUTTON_STATE_ACTIVE:
 			if (p->meta->p2 == p->meta->p3)
@@ -154,6 +157,9 @@ void draw_vec_box(DParam * p, int x, int y, int w, int h,
 			draw_button(x+ew, y, ew, h, state);
 			draw_button(x+ew+ew, y, ew, h, state);
 			break;
+		case UI_BUTTON_STATE_PRESSED:
+			state = UI_BUTTON_STATE_TOGGLED;
+			// no break;
 		case UI_BUTTON_STATE_ACTIVE:
 			draw_button(x, y, ew, h, (btn == 0 ? state :
 					UI_BUTTON_STATE_NORMAL));
@@ -189,15 +195,19 @@ void draw_color_box(DParam * p, int x, int y, int w, int h,
 			draw_button(x+1, y+1, ew*p->v[0]-2, h-2, state);
 			draw_button(x+ew+1, y+1, ew*p->v[1]-2, h-2, state);
 			draw_button(x+ew+ew+1, y+1, ew*p->v[2]-2, h-2, state);
+			break;
+		case UI_BUTTON_STATE_PRESSED:
+			state = UI_BUTTON_STATE_TOGGLED;
+			// no break;
 		case UI_BUTTON_STATE_ACTIVE:
 			draw_button(x, y, ew, h, UI_BUTTON_STATE_PRESSED);
 			draw_button(x+ew, y, ew, h, UI_BUTTON_STATE_PRESSED);
 			draw_button(x+ew+ew, y, ew, h, UI_BUTTON_STATE_PRESSED);
 			draw_button(x+1, y+1, ew*p->v[0]-2, h-2,
 					(btn == 0 ? state : UI_BUTTON_STATE_NORMAL));
-			draw_button(x+ew+1, y+1, ew*p->v[0]-2, h-2,
+			draw_button(x+ew+1, y+1, ew*p->v[1]-2, h-2,
 					(btn == 1 ? state : UI_BUTTON_STATE_NORMAL));
-			draw_button(x+ew+ew+1, y+1, ew*p->v[0]-2, h-2,
+			draw_button(x+ew+ew+1, y+1, ew*p->v[2]-2, h-2,
 					(btn == 2 ? state : UI_BUTTON_STATE_NORMAL));
 			if (btn == 3) {
 				glColor3f(1.0, 0.6, 0.2);

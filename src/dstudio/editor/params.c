@@ -176,6 +176,18 @@ static void hover(int x, int y, int w, int h)
 
 static void click(int x, int y, int w, int h, int btn, int stt)
 {
+	if (stt == WM_BUTTON_DOWN && btn == WM_BUTTON_LEFT) {
+		if (state == UI_BUTTON_STATE_ACTIVE) {
+			state = UI_BUTTON_STATE_PRESSED;
+			wm_require_refresh();
+		}
+	}
+
+	if (stt == WM_BUTTON_UP && btn == WM_BUTTON_LEFT) {
+		state = UI_BUTTON_STATE_NORMAL;
+		hover(x, y, w, h);
+		wm_require_refresh();
+	}
 }
 
 static void drag(int x, int y, int w, int h)
