@@ -26,16 +26,22 @@ static UIMenu menu[] = {
 	{UI_MENU_DONE}
 };
 
-void editor_props_init()
+void editor_params_init()
 {
-	REGISTER_EDITOR("Properties");
+	REGISTER_EDITOR("Parameters");
 	config = d_create_param_from_meta(config_meta);
 }
 
 static void render(int w, int h)
 {
+	glColor3f(0.1, 0.1, 0.1);
+	glRectf(0, 0, w, h);
+
 	static char buf[32];
-	if (!d_active_param) return;
+	if (!d_active_param) {
+		font_render("No Parameters.", 10, h-20);
+		return;
+	}
 	
 	DParam * p = d_active_param;
 	float maxw = 0;

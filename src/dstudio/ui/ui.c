@@ -34,6 +34,8 @@ void draw_edge_x(int y, int w)
 void draw_box_up(int x, int y, int w, int h,
 		float r, float g, float b)
 {
+	if (w <= 0 || h <= 0) return;
+
 	glBegin(GL_QUADS);
 	glColor3f(r * 0.8f, g * 0.8f, b * 0.8f);
 	glVertex2f(x, y);
@@ -47,6 +49,8 @@ void draw_box_up(int x, int y, int w, int h,
 void draw_box_down(int x, int y, int w, int h,
 		float r, float g, float b)
 {
+	if (w <= 0 || h <= 0) return;
+
 	glBegin(GL_QUADS);
 	glColor3f(r * 1.2f, g * 1.2f, b * 1.2f);
 	glVertex2f(x, y);
@@ -59,6 +63,8 @@ void draw_box_down(int x, int y, int w, int h,
 
 void draw_outline(int x, int y, int w, int h)
 {
+	if (w <= 0 || h <= 0) return;
+
 	glLineWidth(2);
 	glBegin(GL_LINE_LOOP);
 	glColor4f(0.2f, 0.2f, 1.0f, 0.2f);
@@ -81,6 +87,8 @@ void draw_outline(int x, int y, int w, int h)
 
 void draw_button(int x, int y, int w, int h, int state)
 {
+	if (w <= 0 || h <= 0) return;
+
 	switch (state) {
 		case UI_BUTTON_STATE_NORMAL:
 			draw_box_up(x, y, w, h, 0.2, 0.2, 0.2);
