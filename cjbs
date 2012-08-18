@@ -14,7 +14,7 @@
 # User Configuration
 #
 
-SRCDIR="src/dstudio src/dshared"
+SRCDIR="src/dshared src/dstudio"
 SRCSUFFIX='.c'
 DESTNAME="dstudio"
 CCFLAGS="-Wall -O3 -s"

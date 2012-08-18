@@ -11,11 +11,7 @@
 #ifndef __D_OPERATOR_H
 #define __D_OPERATOR_H
 
-typedef enum DType
-{
-	D_TYPE_VOID, D_TYPE_FLOAT, D_TYPE_VEC,
-}
-DType;
+#include "../core/param.h"
 
 typedef enum DOperatorCategory
 {
@@ -40,26 +36,10 @@ typedef enum DOperatorType
 }
 DOperatorType;
 
-typedef struct DParam
-{
-	DType type;
-	union {
-		float f;
-		float v[3];
-	};
-}
-DParam;
-
-typedef struct DParamMeta
-{
-	DType type;
-	const char * name;
-	void * p1, * p2, * p3, * p4;
-}
-DParamMeta;
-
-typedef void (DOperatorPullFunc)(void * result, const DParam params[],
-		const void * inputs[], int ninputs);
+typedef void * DOperatorPullFunc;
+typedef void * DTex;
+typedef void (DOperatorPullFuncTex)(DTex result, const DParam params[],
+		const DTex inputs[], int ninputs);
 
 typedef struct DOperator
 {
@@ -75,14 +55,13 @@ typedef struct DNode
 {
 	int opid;		// operator id, for saving
 	DParam * param;
-	DOperator * op;
+	const DOperator * op;
 }
 DNode;
 
-void d_operator_register(const char * name, DParamMeta * param,
-		DOperatorCategory category, DOperatorType type,
-		DOperatorPullFunc pull);
-DParam * d_operator_create_param_from_meta(DParamMeta * param);
+void d_operator_register(const char * name, const DParamMeta * param,
+		const DOperatorCategory category, const DOperatorType type,
+		const DOperatorPullFunc pull);
 
 #endif
 

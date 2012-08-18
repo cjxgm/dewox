@@ -204,11 +204,13 @@ void ui_menu_click(UIMenu menu[], UIMenuParam * param,
 				wm_require_refresh();
 				break;
 			case UI_MENU_BUTTON:
+				if (btn != WM_BUTTON_LEFT) break;
 				button_pressed = 1;
 				wm_capture(m->data, NULL, NULL, button_click, NULL, NULL);
 				wm_require_refresh();
 				break;
 			case UI_MENU_TOGGLE:
+				if (btn != WM_BUTTON_LEFT) break;
 				i = ((int (*)(int))m->data)(-1);
 				((int (*)(int))m->data)(!i);
 				wm_capture(&i, NULL, NULL, toggle_click, NULL, NULL);

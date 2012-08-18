@@ -19,6 +19,7 @@ static DParamMeta param[] = {
 	{D_TYPE_FLOAT, "Radius", 30, 0.0f, 65536.0f, 1.0f},
 	//              label    r     g     b
 	{D_TYPE_COLOR, "Color", 1.0f, 1.0f, 1.0f},
+	{D_TYPE_DONE}
 };
 
 void d_operator_tex_sphere_init()
@@ -28,7 +29,8 @@ void d_operator_tex_sphere_init()
 			D_OPERATOR_TYPE_TEXTURE);
 }
 
-static int pull(DTex result, DParam params[], DTex inputs[], int ninputs)
+static int pull(DTex result, const DParam params[],
+		const DTex inputs[], int ninputs)
 {
 	float * center = params[0].v;	// v = vector3
 	float   radius = params[1].f;	// f = float
