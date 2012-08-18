@@ -40,7 +40,7 @@ static void render(int w, int h)
 
 	if (!d_active_param) {
 		glColor3f(1.0, 0.5, 0.2);
-		font_render("No Parameters.", 10, h-20);
+		font_render("No Parameters.", 10, h-30);
 		return;
 	}
 	
