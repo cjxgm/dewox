@@ -30,6 +30,9 @@ static UIMenu menu[] = {
 static DParam * active_param = NULL;
 static int state = UI_BUTTON_STATE_NORMAL;
 static int state_btn = 0;
+static float drag_start_x = 0;
+static float drag_start_value = 0;
+static float drag_width = 0;
 
 
 
@@ -110,6 +113,7 @@ static void hover(int x, int y, int w, int h)
 	maxw += 20;
 
 	float ww = w-maxw-10;		// widget width
+	drag_width = ww;
 	if (ww <= 0) return;
 	float wh = 18;				// widget height
 
@@ -179,6 +183,9 @@ static void click(int x, int y, int w, int h, int btn, int stt)
 	if (stt == WM_BUTTON_DOWN && btn == WM_BUTTON_LEFT) {
 		if (state == UI_BUTTON_STATE_ACTIVE) {
 			state = UI_BUTTON_STATE_PRESSED;
+			drag_start_x = x;
+			// active_param->f <--> active_param->v[0];
+			drag_start_value = active_param->v[state_btn];
 			wm_require_refresh();
 		}
 	}
@@ -192,6 +199,31 @@ static void click(int x, int y, int w, int h, int btn, int stt)
 
 static void drag(int x, int y, int w, int h)
 {
+	float s = 0;
+	float t = 1;
+	float p = 1e-3;
+
+	if (active_param->meta->type == D_TYPE_FLOAT) {
+		s = active_param->meta->p2;
+		t = active_param->meta->p3;
+		p = active_param->meta->p4;
+		if (s == t) {
+			s = 0;
+			t = 1;
+		}
+		if (p == 0) {
+			p = 1e-3;
+		}
+	}
+
+	float v = lerp(x - drag_start_x, 0, drag_width, 0, t-s) +
+			drag_start_value;
+	v = ((int)(v / p)) * p;
+	if (v < s) v = s;
+	else if (v > t) v = t;
+	// active_param->f <--> active_param->v[0];
+	active_param->v[state_btn] = v;
+	wm_require_refresh();
 }
 
 static void keypress(int key, int w, int h)
