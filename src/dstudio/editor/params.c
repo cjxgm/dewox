@@ -27,6 +27,13 @@ static UIMenu menu[] = {
 	{UI_MENU_DONE}
 };
 
+static DParam * active_param = NULL;
+static int state = UI_BUTTON_STATE_NORMAL;
+static int state_btn = 0;
+
+
+
+
 void editor_params_init()
 {
 	REGISTER_EDITOR("Parameters");
@@ -44,6 +51,7 @@ static void render(int w, int h)
 		return;
 	}
 	
+	// calculate the label column's width
 	DParam * p = d_active_param;
 	float maxw = 0;
 	while (p->meta->type) {
@@ -53,6 +61,7 @@ static void render(int w, int h)
 	}
 	maxw += 20;
 
+	// draw the label and the value
 	p = d_active_param;
 	while (p->meta->type) {
 		float y = h-10 - 20 - (p-d_active_param)*20;
@@ -63,15 +72,21 @@ static void render(int w, int h)
 		switch (p->meta->type) {
 			case D_TYPE_FLOAT:
 				draw_float_box(p, maxw, y, w-maxw-10, 18,
-						UI_BUTTON_STATE_NORMAL);
+						(active_param == p ?
+								state :
+								UI_BUTTON_STATE_NORMAL));
 				break;
 			case D_TYPE_VEC:
 				draw_vec_box(p, maxw, y, w-maxw-10, 18,
-						UI_BUTTON_STATE_NORMAL, 0);
+						(active_param == p ?
+								state :
+								UI_BUTTON_STATE_NORMAL), state_btn);
 				break;
 			case D_TYPE_COLOR:
 				draw_color_box(p, maxw, y, w-maxw-10, 18,
-						UI_BUTTON_STATE_NORMAL, 0);
+						(active_param == p ?
+								state :
+								UI_BUTTON_STATE_NORMAL), state_btn);
 				break;
 			default:
 				break;
@@ -82,6 +97,81 @@ static void render(int w, int h)
 
 static void hover(int x, int y, int w, int h)
 {
+	if (!d_active_param) return;
+
+	// calculate the label column's width
+	DParam * p = d_active_param;
+	float maxw = 0;
+	while (p->meta->type) {
+		float w = font_width(p->meta->name);
+		if (w > maxw) maxw = w;
+		p++;
+	}
+	maxw += 20;
+
+	float ww = w-maxw-10;		// widget width
+	if (ww <= 0) return;
+	float wh = 18;				// widget height
+
+	// process event
+	p = d_active_param;
+	while (p->meta->type) {
+		float wy = h-10 - 20 - (p-d_active_param)*20;	// widget y
+		int t;
+
+		switch (p->meta->type) {
+			case D_TYPE_FLOAT:
+				if (x>maxw && x<maxw+ww && y>wy && y<wy+wh) {
+					if (state != UI_BUTTON_STATE_ACTIVE ||
+								active_param != p) {
+						state = UI_BUTTON_STATE_ACTIVE;
+						active_param = p;
+						wm_require_refresh();
+					}
+					return;
+				}
+			case D_TYPE_VEC:
+				if (x>maxw && x<maxw+ww && y>wy && y<wy+wh) {
+					t = (x-maxw) * 3 / ww;
+					if (state != UI_BUTTON_STATE_ACTIVE ||
+								active_param != p ||
+								state_btn != t) {
+						state = UI_BUTTON_STATE_ACTIVE;
+						active_param = p;
+						state_btn = t;
+						wm_require_refresh();
+					}
+					return;
+				}
+				break;
+			case D_TYPE_COLOR:
+				if (x>maxw && x<maxw+ww && y>wy && y<wy+wh) {
+					if (x-maxw > ww-18) t = 3;
+					else t = (x-maxw) * 3 / (ww-20);
+
+					if (state != UI_BUTTON_STATE_ACTIVE ||
+								active_param != p ||
+								state_btn != t) {
+						state = UI_BUTTON_STATE_ACTIVE;
+						active_param = p;
+						state_btn = t;
+						wm_require_refresh();
+					}
+					return;
+				}
+				break;
+			default:
+				break;
+		}
+		p++;
+	}
+
+	if (state != UI_BUTTON_STATE_NORMAL || active_param) {
+		active_param = NULL;
+		state = UI_BUTTON_STATE_NORMAL;
+		state_btn = 0;
+		wm_require_refresh();
+	}
 }
 
 static void click(int x, int y, int w, int h, int btn, int stt)
