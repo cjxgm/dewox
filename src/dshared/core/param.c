@@ -19,7 +19,7 @@ DParam * d_create_param_from_meta(const DParamMeta * param)
 	while (param[nparam++].type);
 	if (!nparam) return NULL;
 
-	CREATE2(DParam, p, nparam);
+	CREATE2(DParam, p, nparam+1);	// +1 for D_TYPE_DONE
 
 	int i;
 	// NOTE that it's "i<=nparam", NOT "i<nparam".
