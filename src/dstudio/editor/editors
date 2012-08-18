@@ -15,3 +15,6 @@
 
 	void editor_props_init();
 	editor_props_init();
+
+	void editor_color_init();
+	editor_color_init();

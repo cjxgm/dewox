@@ -23,6 +23,16 @@ void font_render(const char * str, int x, int y)
 	}
 }
 
+void font_renderw(const char * str, int x, int y, float w)
+{
+	w += x;
+	while (*str) {
+		if (x + 8 > w) return;
+		draw_char(x, y, *str++);
+		x += 8;
+	}
+}
+
 int font_width(const char * str)
 {
 	return strlen(str)*8;
