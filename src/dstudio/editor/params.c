@@ -281,6 +281,25 @@ static void keypress(int key, int w, int h)
 			wm_require_refresh();
 			break;
 		case ']':		// set animation end time
+			if (active_param->meta->type == D_TYPE_FLOAT) {
+				active_param->af.tt = d_playing_time;
+				active_param->af.vf = active_param->f;
+				if (!active_param->af.enabled) {
+					active_param->af.enabled = 1;
+					active_param->af.tf = d_playing_time - 1000;
+					active_param->af.vf = active_param->f;
+				}
+			}
+			else {
+				active_param->av.tt = d_playing_time;
+				vec_cpy(active_param->av.vt, active_param->v);
+				if (!active_param->af.enabled) {
+					active_param->av.enabled = 1;
+					active_param->av.tf = d_playing_time - 1000;
+					vec_cpy(active_param->av.vf, active_param->v);
+				}
+			}
+			wm_require_refresh();
 			break;
 	}
 }

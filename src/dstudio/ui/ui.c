@@ -143,6 +143,27 @@ void draw_float_box(DParam * p, int x, int y, int w, int h, int state)
 	glColor3f(1.0, 1.0, 1.0);
 	sprintf(buf, "%g", p->f);
 	font_renderw(buf, x+10, y, w-20);
+
+	if (p->af.enabled) {
+		glLineWidth(2.0);
+		glBegin(GL_LINES);
+		glColor3f(1.0f, 0.6f, 0.2f);
+		glVertex2f(x, y);
+		glVertex2f(x, y+h);
+
+		glColor3f(1.0f, 0.2f, 0.6f);
+		glVertex2f(x+w, y);
+		glVertex2f(x+w, y+h);
+
+		if (d_playing_time > p->af.tf && d_playing_time < p->af.tt) {
+			float t = lerp(d_playing_time, p->af.tf, p->af.tt, 0, w);
+			glColor3f(0.2f, 1.0f, 0.2f);
+			glVertex2f(x+t, y);
+			glVertex2f(x+t, y+h);
+		}
+
+		glEnd();
+	}
 }
 
 void draw_vec_box(DParam * p, int x, int y, int w, int h,

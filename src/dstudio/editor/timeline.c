@@ -92,18 +92,17 @@ static void render(int w, int h)
 	if (d_active_param) {
 		DParam * p = d_active_param;
 		while (p->meta->type) {
-			if (d_active_param->meta->type == D_TYPE_FLOAT &&
-					d_active_param->af.enabled) {
+			if (p->meta->type == D_TYPE_FLOAT && p->af.enabled) {
 				float x;
 				glLineWidth(2.0);
 				glBegin(GL_LINES);
 				glColor3f(1.0f, 0.6f, 0.2f);
-				x = lerp(d_active_param->af.tf, start_time, end_time, 0, w);
+				x = lerp(p->af.tf, start_time, end_time, 0, w);
 				glVertex2f(x, 0);
 				glVertex2f(x, h);
 
 				glColor3f(1.0f, 0.2f, 0.6f);
-				x = lerp(d_active_param->af.tt, start_time, end_time, 0, w);
+				x = lerp(p->af.tt, start_time, end_time, 0, w);
 				glVertex2f(x, 0);
 				glVertex2f(x, h);
 				glEnd();
