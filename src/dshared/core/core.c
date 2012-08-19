@@ -12,6 +12,7 @@
 
 int d_playing = 0;
 int d_playing_time = 0;
+int d_time_changed = 0;
 
 static int start_time;
 
@@ -28,7 +29,9 @@ inline void d_stop()
 
 inline void d_refresh(long ticks)
 {
-	if (d_playing)
+	if (d_playing) {
 		d_playing_time = ticks - start_time;
+		d_time_changed = 1;
+	}
 }
 

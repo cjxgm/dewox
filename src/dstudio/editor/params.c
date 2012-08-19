@@ -53,7 +53,9 @@ static void render(int w, int h)
 		font_render("No Parameters.", 10, h-30);
 		return;
 	}
-	
+
+	d_apply_param_anim(d_active_param);
+
 	// calculate the label column's width
 	DParam * p = d_active_param;
 	float maxw = 0;
@@ -283,7 +285,7 @@ static void keypress(int key, int w, int h)
 		case ']':		// set animation end time
 			if (active_param->meta->type == D_TYPE_FLOAT) {
 				active_param->af.tt = d_playing_time;
-				active_param->af.vf = active_param->f;
+				active_param->af.vt = active_param->f;
 				if (!active_param->af.enabled) {
 					active_param->af.enabled = 1;
 					active_param->af.tf = d_playing_time - 1000;

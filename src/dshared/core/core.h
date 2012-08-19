@@ -24,6 +24,7 @@
 
 extern int d_playing;
 extern int d_playing_time;
+extern int d_time_changed;
 
 inline void d_play();
 inline void d_stop();

@@ -10,6 +10,8 @@
 
 #include "param.h"
 #include "core.h"
+#include "../math/erp.h"
+#include "../math/vector.h"
 
 DParam * d_active_param;
 
@@ -42,5 +44,30 @@ DParam * d_create_param_from_meta(const DParamMeta * param)
 	}
 
 	return p;
+}
+
+void d_apply_param_anim(DParam * param)
+{
+	if (!param) return;
+	if (!d_time_changed) return;
+
+	DParam * p = param;
+	while (p->meta->type) {
+		float prec = 1e-4;
+		if (p->meta->type == D_TYPE_FLOAT) {
+			if (p->meta->p4 != 0) prec = p->meta->p4;
+
+			if (p->af.enabled) {
+				if (d_playing_time <= p->af.tf)
+					p->f = p->af.vf;
+				else if (d_playing_time >= p->af.tt)
+					p->f = p->af.vt;
+				else p->f = lerp(d_playing_time, p->af.tf, p->af.tt,
+						p->af.vf, p->af.vt);
+				p->f = ((int)(p->f / prec)) * prec;	// clamp to precision
+			}
+		}
+		p++;
+	}
 }
 

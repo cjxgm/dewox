@@ -227,6 +227,7 @@ static int play_cb(int state)
 static void set_playing_time(int t)
 {
 	d_playing_time = t;
+	d_time_changed = 2;
 	if (d_playing) {
 		// to reset the player's "tape header"
 		d_stop();

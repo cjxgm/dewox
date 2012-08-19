@@ -628,6 +628,8 @@ static void render(int win, int x, int y, int w, int h)
 		}
 		wm_require_refresh();
 	}
+
+	if (d_time_changed) d_time_changed--;
 }
 
 ////////////////////////////////////////

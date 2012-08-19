@@ -66,6 +66,7 @@ DParam;
 extern DParam * d_active_param;
 
 DParam * d_create_param_from_meta(const DParamMeta * param);
+void d_apply_param_anim(DParam * param);
 
 #endif
 
