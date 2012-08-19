@@ -67,6 +67,20 @@ void d_apply_param_anim(DParam * param)
 				p->f = ((int)(p->f / prec)) * prec;	// clamp to precision
 			}
 		}
+		else {
+			if (p->av.enabled) {
+				if (d_playing_time <= p->av.tf)
+					vec_cpy(p->v, p->av.vf);
+				else if (d_playing_time >= p->av.tt)
+					vec_cpy(p->v, p->av.vt);
+				else vec_lerp(p->v,
+						(d_playing_time - p->av.tf) / (p->av.tt - p->av.tf),
+						p->av.vf, p->av.vt);
+				p->v[0] = ((int)(p->v[0] / prec)) * prec;// clamp to prec
+				p->v[1] = ((int)(p->v[1] / prec)) * prec;// clamp to prec
+				p->v[2] = ((int)(p->v[2] / prec)) * prec;// clamp to prec
+			}
+		}
 		p++;
 	}
 }

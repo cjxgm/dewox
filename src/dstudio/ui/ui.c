@@ -144,6 +144,7 @@ void draw_float_box(DParam * p, int x, int y, int w, int h, int state)
 	sprintf(buf, "%g", p->f);
 	font_renderw(buf, x+10, y, w-20);
 
+	// animation
 	if (p->af.enabled) {
 		glLineWidth(2.0);
 		glBegin(GL_LINES);
@@ -197,6 +198,28 @@ void draw_vec_box(DParam * p, int x, int y, int w, int h,
 	font_renderw(buf, x+ew+10, y, ew-20);
 	sprintf(buf, "%g", p->v[2]);
 	font_renderw(buf, x+ew+ew+10, y, ew-20);
+
+	// animation
+	if (p->av.enabled) {
+		glLineWidth(2.0);
+		glBegin(GL_LINES);
+		glColor3f(1.0f, 0.6f, 0.2f);
+		glVertex2f(x, y);
+		glVertex2f(x, y+h);
+
+		glColor3f(1.0f, 0.2f, 0.6f);
+		glVertex2f(x+w, y);
+		glVertex2f(x+w, y+h);
+
+		if (d_playing_time > p->av.tf && d_playing_time < p->av.tt) {
+			float t = lerp(d_playing_time, p->av.tf, p->av.tt, 0, w);
+			glColor3f(0.2f, 1.0f, 0.2f);
+			glVertex2f(x+t, y);
+			glVertex2f(x+t, y+h);
+		}
+
+		glEnd();
+	}
 }
 
 void draw_color_box(DParam * p, int x, int y, int w, int h,
@@ -244,7 +267,32 @@ void draw_color_box(DParam * p, int x, int y, int w, int h,
 	sprintf(buf, "%g", p->v[2]);
 	font_renderw(buf, x+ew+ew+10, y, ew-20);
 
+	// color picker
 	glColor3f(p->v[0], p->v[1], p->v[2]);
 	glRectf(x+w+2, y, x+w+20, y+h);
+
+	// animation
+	if (p->av.enabled) {
+		w--;
+
+		glLineWidth(2.0);
+		glBegin(GL_LINES);
+		glColor3f(1.0f, 0.6f, 0.2f);
+		glVertex2f(x, y);
+		glVertex2f(x, y+h);
+
+		glColor3f(1.0f, 0.2f, 0.6f);
+		glVertex2f(x+w, y);
+		glVertex2f(x+w, y+h);
+
+		if (d_playing_time > p->av.tf && d_playing_time < p->av.tt) {
+			float t = lerp(d_playing_time, p->av.tf, p->av.tt, 0, w);
+			glColor3f(0.2f, 1.0f, 0.2f);
+			glVertex2f(x+t, y);
+			glVertex2f(x+t, y+h);
+		}
+
+		glEnd();
+	}
 }
 
