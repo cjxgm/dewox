@@ -113,7 +113,6 @@ static void hover(int x, int y, int w, int h)
 	maxw += 20;
 
 	float ww = w-maxw-10;		// widget width
-	drag_width = ww;
 	if (ww <= 0) return;
 	float wh = 18;				// widget height
 
@@ -130,6 +129,7 @@ static void hover(int x, int y, int w, int h)
 								active_param != p) {
 						state = UI_BUTTON_STATE_ACTIVE;
 						active_param = p;
+						drag_width = ww;
 						wm_require_refresh();
 					}
 					return;
@@ -143,6 +143,7 @@ static void hover(int x, int y, int w, int h)
 						state = UI_BUTTON_STATE_ACTIVE;
 						active_param = p;
 						state_btn = t;
+						drag_width = ww / 3.0f;
 						wm_require_refresh();
 					}
 					return;
@@ -159,6 +160,7 @@ static void hover(int x, int y, int w, int h)
 						state = UI_BUTTON_STATE_ACTIVE;
 						active_param = p;
 						state_btn = t;
+						drag_width = (ww - 20) / 3.0f;
 						wm_require_refresh();
 					}
 					return;
@@ -199,28 +201,54 @@ static void click(int x, int y, int w, int h, int btn, int stt)
 
 static void drag(int x, int y, int w, int h)
 {
-	float s = 0;
-	float t = 1;
-	float p = 1e-3;
+	if (!active_param) return;
+	if (state_btn == 3) return;	// no need for color picker
+
+	float s;		// start ` formed the range [start, to]
+	float t;		// to	 /
+	float p;		// precise
+	float v = 0;	// new value, "=0" to avoid warnings of gcc
 
 	if (active_param->meta->type == D_TYPE_FLOAT) {
 		s = active_param->meta->p2;
 		t = active_param->meta->p3;
 		p = active_param->meta->p4;
+		if (p == 0) p = 1e-4;
+
 		if (s == t) {
 			s = 0;
-			t = 1;
+			t = 10;
+			v = lerp(x - drag_start_x, 0, drag_width, 0, t-s) +
+				drag_start_value;
+			v = ((int)(v / p)) * p;		// clamp to precise
 		}
-		if (p == 0) {
-			p = 1e-3;
+		else {
+			v = lerp(x - drag_start_x, 0, drag_width, 0, t-s) +
+				drag_start_value;
+			v = ((int)(v / p)) * p;		// clamp to precise
+			if (v < s) v = s;
+			else if (v > t) v = t;
 		}
 	}
-
-	float v = lerp(x - drag_start_x, 0, drag_width, 0, t-s) +
+	else if (active_param->meta->type == D_TYPE_VEC) {
+		s = 0;
+		t = 10;
+		p = 1e-4;
+		v = lerp(x - drag_start_x, 0, drag_width, 0, t-s) +
 			drag_start_value;
-	v = ((int)(v / p)) * p;
-	if (v < s) v = s;
-	else if (v > t) v = t;
+		v = ((int)(v / p)) * p;		// clamp to precise
+	}
+	else if (active_param->meta->type == D_TYPE_COLOR) {
+		s = 0;
+		t = 1;
+		p = 1e-4;
+		v = lerp(x - drag_start_x, 0, drag_width, 0, t-s) +
+			drag_start_value;
+		v = ((int)(v / p)) * p;		// clamp to precise
+		if (v < s) v = s;
+		else if (v > t) v = t;
+	}
+
 	// active_param->f <--> active_param->v[0];
 	active_param->v[state_btn] = v;
 	wm_require_refresh();
