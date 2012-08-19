@@ -275,6 +275,7 @@ static void idle()
 				// no need for specifying width and height, so set to 0.
 				cap.render(0, 0);
 			}
+			if (d_time_changed) d_time_changed--;
 			break;
 	}
 	glutSwapBuffers();
@@ -628,8 +629,6 @@ static void render(int win, int x, int y, int w, int h)
 		}
 		wm_require_refresh();
 	}
-
-	if (d_time_changed) d_time_changed--;
 }
 
 ////////////////////////////////////////
