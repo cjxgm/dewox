@@ -29,12 +29,36 @@ typedef struct DParamMeta
 }
 DParamMeta;
 
+typedef struct DAnimFloat
+{
+	int enabled;
+	float tf;		// time from
+	float tt;		// time to
+	float vf;		// value from
+	float vt;		// value to
+}
+DAnimFloat;
+
+typedef struct DAnimVec
+{
+	int enabled;
+	float tf;		// time from
+	float tt;		// time to
+	float vf[3];	// value from
+	float vt[3];	// value to
+}
+DAnimVec;
+
 typedef struct DParam
 {
 	const DParamMeta * meta;
 	union {
-		float f;
-		float v[3];
+		float f;		// float
+		float v[3];		// vector
+	};
+	union {
+		DAnimFloat af;		// animation float
+		DAnimVec   av;		// animation vector
 	};
 }
 DParam;

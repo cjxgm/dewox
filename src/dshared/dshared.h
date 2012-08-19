@@ -19,6 +19,7 @@
 #include "misc/logo.h"
 #include "font/font.h"
 #include "math/erp.h"
+#include "math/vector.h"
 #include "operator/operator.h"
 
 #endif
