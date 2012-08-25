@@ -45,6 +45,8 @@ void editor_params_init()
 
 static void render(int w, int h)
 {
+	d_apply_param_anim(config);
+
 	glColor3f(0.1, 0.1, 0.1);
 	glRectf(0, 0, w, h);
 
@@ -53,7 +55,6 @@ static void render(int w, int h)
 		font_render("No Parameters.", 10, h-30);
 		return;
 	}
-
 	d_apply_param_anim(d_active_param);
 
 	// calculate the label column's width

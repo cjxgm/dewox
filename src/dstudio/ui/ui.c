@@ -148,11 +148,18 @@ void draw_float_box(DParam * p, int x, int y, int w, int h, int state)
 	if (p->af.enabled) {
 		glLineWidth(2.0);
 		glBegin(GL_LINES);
-		glColor3f(1.0f, 0.6f, 0.2f);
+
+		if (d_playing_time < p->af.tt)
+			glColor3f(1.0f, 0.6f, 0.2f);
+		else
+			glColor3f(0.5f, 0.3f, 0.1f);
 		glVertex2f(x, y);
 		glVertex2f(x, y+h);
 
-		glColor3f(1.0f, 0.2f, 0.6f);
+		if (d_playing_time > p->af.tf)
+			glColor3f(1.0f, 0.2f, 0.6f);
+		else
+			glColor3f(0.5f, 0.1f, 0.3f);
 		glVertex2f(x+w, y);
 		glVertex2f(x+w, y+h);
 
@@ -203,11 +210,18 @@ void draw_vec_box(DParam * p, int x, int y, int w, int h,
 	if (p->av.enabled) {
 		glLineWidth(2.0);
 		glBegin(GL_LINES);
-		glColor3f(1.0f, 0.6f, 0.2f);
+
+		if (d_playing_time < p->av.tt)
+			glColor3f(1.0f, 0.6f, 0.2f);
+		else
+			glColor3f(0.5f, 0.3f, 0.1f);
 		glVertex2f(x, y);
 		glVertex2f(x, y+h);
 
-		glColor3f(1.0f, 0.2f, 0.6f);
+		if (d_playing_time > p->av.tf)
+			glColor3f(1.0f, 0.2f, 0.6f);
+		else
+			glColor3f(0.5f, 0.1f, 0.3f);
 		glVertex2f(x+w, y);
 		glVertex2f(x+w, y+h);
 
@@ -277,11 +291,18 @@ void draw_color_box(DParam * p, int x, int y, int w, int h,
 
 		glLineWidth(2.0);
 		glBegin(GL_LINES);
-		glColor3f(1.0f, 0.6f, 0.2f);
+
+		if (d_playing_time < p->av.tt)
+			glColor3f(1.0f, 0.6f, 0.2f);
+		else
+			glColor3f(0.5f, 0.3f, 0.1f);
 		glVertex2f(x, y);
 		glVertex2f(x, y+h);
 
-		glColor3f(1.0f, 0.2f, 0.6f);
+		if (d_playing_time > p->av.tf)
+			glColor3f(1.0f, 0.2f, 0.6f);
+		else
+			glColor3f(0.5f, 0.1f, 0.3f);
 		glVertex2f(x+w, y);
 		glVertex2f(x+w, y+h);
 

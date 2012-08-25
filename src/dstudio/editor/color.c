@@ -31,6 +31,8 @@ void editor_color_init()
 
 static void render(int w, int h)
 {
+	d_apply_param_anim(config);
+
 	glColor3f(config[0].v[0], config[0].v[1], config[0].v[2]);
 	glRectf(0, 0, w, h);
 }
