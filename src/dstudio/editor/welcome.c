@@ -9,14 +9,29 @@
  ************************************************************/
 
 #include "editor_decl.h"
+#include "../ui/cmenu.h"
+
+static void show_cmenu_cb();
+static void cmenu_play_cb();
 
 static UIMenu menu[] = {
+	{UI_MENU_BUTTON, &show_cmenu_cb, "Show CMenu"},
 	{UI_MENU_DONE}
 };
+
+static CMenu * cmenu;
+
+
+
 
 void editor_welcome_init()
 {
 	REGISTER_EDITOR("Welcome");
+
+	cmenu = cmenu_create();
+	CMenuSub * sub_a = cmenu_sub_add(cmenu->sub, "Sub A", 0, NULL, NULL);
+	cmenu_sub_add(cmenu->sub, "Next", 0, NULL, cmenu->sub);
+	cmenu_sub_add(sub_a, "Play" , 0, (void *)&cmenu_play_cb, NULL);
 }
 
 static void render(int w, int h)
@@ -78,5 +93,18 @@ static void drag(int x, int y, int w, int h)
 
 static void keypress(int key, int w, int h)
 {
+}
+
+
+
+
+static void show_cmenu_cb()
+{
+	cmenu_show(cmenu, 100, 100);
+}
+
+static void cmenu_play_cb()
+{
+	d_play();
 }
 
