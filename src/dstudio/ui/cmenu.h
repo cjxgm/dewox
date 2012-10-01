@@ -17,6 +17,8 @@
 #define CMENU_ITEM_SIZE			32
 
 
+
+
 typedef void (CMenuCallback)(void * data);
 
 typedef struct CMenuItem
@@ -54,6 +56,8 @@ typedef struct CMenu
 	float newh;
 }
 CMenu;
+
+
 
 
 CMenu * cmenu_create();

@@ -16,10 +16,22 @@
 #include <GL/gl.h>
 #include <string.h>
 
+
 static CMenuSub * cmenu_sub_create();
+static void cmenu_push(CMenu * menu, CMenuSub * sub);
+
+void cmenu_render(int w, int h);
+void cmenu_hover(int x, int y, int w, int h);
+void cmenu_click(int x, int y, int w, int h, int btn, int stt);
+void cmenu_keypress(int key, int w, int h);
+
+static CMenu * cmenu;
+static float cmenu_x;
+static float cmenu_y;
 
 
 
+// external functions
 
 CMenu * cmenu_create()
 {
@@ -44,11 +56,23 @@ void * cmenu_sub_add(CMenuSub * sub, const char * name, int key,
 	item->callback = callback;
 	item->data     = data;
 
+	int w = font_width(name);
+	if (w > sub->w) sub->w = w;
+
 	return data;
 }
 
 void cmenu_show(CMenu * menu, float x, float y)
 {
+	cmenu   = menu;
+	cmenu_x = x;
+	cmenu_y = y;
+
+	menu->w = menu->h = 0;
+	cmenu_push(menu, menu->sub);
+	wm_capture(menu, cmenu_render, cmenu_hover,
+			cmenu_click, NULL, cmenu_keypress);
+	wm_require_refresh();
 }
 
 CMenuItem * cmenu_sub_find(CMenuSub * sub, const char * name)
@@ -62,6 +86,7 @@ CMenuItem * cmenu_sub_find(CMenuSub * sub, const char * name)
 
 
 
+// internal functions
 
 static CMenuSub * cmenu_sub_create()
 {
@@ -69,5 +94,36 @@ static CMenuSub * cmenu_sub_create()
 	sub->size = 0;
 	sub->w    = 0;
 	return sub;
+}
+
+
+static void cmenu_push(CMenu * menu, CMenuSub * sub)
+{
+	CMenuStack * s = &menu->stack[++menu->sp];
+	s->sub      = sub;
+	s->selected = -1;
+}
+
+
+
+
+// rendering & events
+
+void cmenu_render(int w, int h)
+{
+	glColor4f(1, 1, 1, 0.8f);
+	glRectf(cmenu_x, cmenu_y, cmenu_x+100, cmenu_y+100);
+}
+
+void cmenu_hover(int x, int y, int w, int h)
+{
+}
+
+void cmenu_click(int x, int y, int w, int h, int btn, int stt)
+{
+}
+
+void cmenu_keypress(int key, int w, int h)
+{
 }
 

@@ -26,12 +26,12 @@ static CMenu * cmenu;
 
 void editor_welcome_init()
 {
-	REGISTER_EDITOR("Welcome");
-
 	cmenu = cmenu_create();
 	CMenuSub * sub_a = cmenu_sub_add(cmenu->sub, "Sub A", 0, NULL, NULL);
 	cmenu_sub_add(cmenu->sub, "Next", 0, NULL, cmenu->sub);
 	cmenu_sub_add(sub_a, "Play" , 0, (void *)&cmenu_play_cb, NULL);
+
+	REGISTER_EDITOR("Welcome");
 }
 
 static void render(int w, int h)
