@@ -303,8 +303,12 @@ static void editor_selector_drag(int x, int y, int w, int h)
 static void button_click(int x, int y, int w, int h, int btn, int stt)
 {
 	if (stt == WM_BUTTON_UP) {
-		if (wm_capdata()) ((void (*)())wm_capdata())();
-		wm_uncapture();
+		if (wm_capdata()) {
+			void * callback = wm_capdata();
+			wm_uncapture();
+			((void (*)())callback)();
+		}
+		else wm_uncapture();
 		button_pressed = 0;
 		wm_require_refresh();
 	}
