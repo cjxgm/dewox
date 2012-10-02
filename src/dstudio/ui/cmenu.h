@@ -50,10 +50,6 @@ typedef struct CMenu
 	CMenuSub * sub;
 	CMenuStack stack[CMENU_STACK_SIZE];
 	int sp;
-	float w;
-	float h;
-	float neww;
-	float newh;
 }
 CMenu;
 

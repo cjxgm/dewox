@@ -15,6 +15,8 @@
 #define WM_MAX_EDITOR_CNT				16
 
 // #define WM_FULLSCREEN
+//
+#define CMENU_SPEED						100
 
 #endif
 

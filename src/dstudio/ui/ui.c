@@ -317,3 +317,11 @@ void draw_color_box(DParam * p, int x, int y, int w, int h,
 	}
 }
 
+
+
+
+int is_in_box(float x, float y, float x1, float y1, float x2, float y2)
+{
+	return (x>=x1 && x<=x2 && y>=y1 && y<=y2);
+}
+
